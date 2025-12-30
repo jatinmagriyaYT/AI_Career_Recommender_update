@@ -1,0 +1,919 @@
+{% load static %}
+{% include "logo.html" %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MBTI Personality Test - AI Career System</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #8B5FBF;
+            --secondary: #D4A5A5;
+            --success: #06D6A0;
+            --info: #118AB2;
+            --warning: #FFD166;
+            --danger: #EF476F;
+            --light: #F8F9FA;
+            --dark: #212529;
+            --sidebar-bg: #2D3047;
+            --card-bg: #FFFFFF;
+            --text-primary: #333333;
+            --text-secondary: #6C757D;
+            --gradient-primary: linear-gradient(135deg, #8B5FBF 0%, #6A4C93 100%);
+            --gradient-secondary: linear-gradient(135deg, #D4A5A5 0%, #C89595 100%);
+            --gradient-success: linear-gradient(135deg, #06D6A0 0%, #04B588 100%);
+            --gradient-warning: linear-gradient(135deg, #FFD166 0%, #FFC145 100%);
+            --gradient-info: linear-gradient(135deg, #118AB2 0%, #0A6E8F 100%);
+            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --hover-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #F5F7FA 0%, #E4E7EB 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .test-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: var(--card-shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .test-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: var(--gradient-primary);
+        }
+
+        .test-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .test-header h1 {
+            color: var(--primary);
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .test-header p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .mbti-info {
+            background: rgba(139, 95, 191, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(139, 95, 191, 0.1);
+        }
+
+        .info-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .info-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--gradient-primary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            color: white;
+            font-size: 1.3rem;
+        }
+
+        .info-title {
+            color: var(--primary);
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .info-content {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .dimensions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .dimension-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: var(--card-shadow);
+            border-top: 4px solid var(--primary);
+        }
+
+        .dimension-icon {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .dimension-name {
+            color: var(--text-primary);
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .dimension-desc {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+
+        .progress-section {
+            margin-bottom: 30px;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .progress-label {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .progress-percentage {
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: rgba(139, 95, 191, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--gradient-primary);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        .question-container {
+            margin-bottom: 30px;
+        }
+
+        .question-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .question-card:hover {
+            box-shadow: var(--hover-shadow);
+            transform: translateY(-2px);
+        }
+
+        .question-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 35px;
+            height: 35px;
+            background: var(--gradient-primary);
+            color: white;
+            border-radius: 50%;
+            font-weight: 700;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+        }
+
+        .question-text {
+            color: var(--text-primary);
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .scale-labels {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            text-align: center;
+            margin-bottom: 15px;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .radio-group {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+        }
+
+        .radio-option {
+            position: relative;
+            text-align: center;
+        }
+
+        /* FIXED: Radio button styling */
+        .radio-option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+            z-index: 2;
+        }
+
+        .radio-label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 15px 10px;
+            background: rgba(139, 95, 191, 0.05);
+            border: 2px solid rgba(139, 95, 191, 0.1);
+            border-radius: 12px;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            position: relative;
+            z-index: 1;
+        }
+
+        .radio-label:hover {
+            background: rgba(139, 95, 191, 0.1);
+            border-color: var(--primary);
+        }
+
+        .radio-option input[type="radio"]:checked + .radio-label {
+            background: var(--gradient-primary);
+            color: white;
+            border-color: var(--primary);
+            transform: scale(1.05);
+        }
+
+        .radio-number {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .radio-text {
+            font-size: 0.75rem;
+            opacity: 0.8;
+        }
+
+        .btn-container {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 40px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 15px 35px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: 0 4px 15px rgba(139, 95, 191, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(139, 95, 191, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(139, 95, 191, 0.1);
+            color: var(--primary);
+            border: 1px solid rgba(139, 95, 191, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(139, 95, 191, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .btn i {
+            margin-right: 8px;
+        }
+
+        .section-divider {
+            height: 2px;
+            background: rgba(139, 95, 191, 0.1);
+            margin: 30px 0;
+            border: none;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .test-card {
+                padding: 25px;
+            }
+            
+            .test-header h1 {
+                font-size: 2rem;
+            }
+            
+            .radio-group {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .scale-labels {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .btn-container {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .dimensions-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .radio-group {
+                grid-template-columns: 1fr;
+            }
+            
+            .scale-labels {
+                display: none;
+            }
+        }
+
+        .instructions {
+            background: rgba(255, 209, 102, 0.1);
+            border: 1px solid rgba(255, 209, 102, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .instructions h3 {
+            color: #B38B00;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .instructions h3 i {
+            margin-right: 10px;
+        }
+
+        .instructions ul {
+            color: var(--text-secondary);
+            padding-left: 20px;
+        }
+
+        .instructions li {
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        /* FIXED: Ensure proper click area */
+        .radio-option {
+            position: relative;
+        }
+
+        .radio-option * {
+            pointer-events: none;
+        }
+
+        .radio-option input[type="radio"] {
+            pointer-events: all;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="test-card">
+            <div class="test-header">
+                <h1>MBTI Personality Assessment</h1>
+                <p>Discover your personality type and find careers that align with your natural strengths and preferences</p>
+            </div>
+
+            <!-- MBTI Information -->
+            <div class="mbti-info">
+                <div class="info-header">
+                    <div class="info-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h3 class="info-title">About the MBTI Assessment</h3>
+                </div>
+                <div class="info-content">
+                    <p>The Myers-Briggs Type Indicator (MBTI) helps identify your natural preferences in four key dimensions. Your results will help us match you with careers where you're likely to thrive and find fulfillment.</p>
+                </div>
+            </div>
+
+            <!-- MBTI Dimensions -->
+            <div class="dimensions-grid">
+                <div class="dimension-card">
+                    <div class="dimension-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="dimension-name">Extraversion (E) / Introversion (I)</div>
+                    <div class="dimension-desc">Where you focus your attention and get energy</div>
+                </div>
+                <div class="dimension-card">
+                    <div class="dimension-icon">
+                        <i class="fas fa-lightbulb"></i>
+                    </div>
+                    <div class="dimension-name">Sensing (S) / Intuition (N)</div>
+                    <div class="dimension-desc">How you take in information</div>
+                </div>
+                <div class="dimension-card">
+                    <div class="dimension-icon">
+                        <i class="fas fa-balance-scale"></i>
+                    </div>
+                    <div class="dimension-name">Thinking (T) / Feeling (F)</div>
+                    <div class="dimension-desc">How you make decisions</div>
+                </div>
+                <div class="dimension-card">
+                    <div class="dimension-icon">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <div class="dimension-name">Judging (J) / Perceiving (P)</div>
+                    <div class="dimension-desc">How you deal with the outside world</div>
+                </div>
+            </div>
+
+            <!-- Instructions -->
+            <div class="instructions">
+                <h3><i class="fas fa-info-circle"></i> How to Complete This Assessment</h3>
+                <ul>
+                    <li>Answer each question based on your natural preferences, not what you think you "should" choose</li>
+                    <li>There are no right or wrong answers - be honest about your tendencies</li>
+                    <li>Choose the option that feels most true to you, even if it's not always true</li>
+                    <li>Complete all questions to get accurate results</li>
+                </ul>
+            </div>
+
+            <hr class="section-divider">
+
+            <!-- Progress Section -->
+            <div class="progress-section">
+                <div class="progress-header">
+                    <span class="progress-label">Assessment Progress</span>
+                    <span class="progress-percentage" id="progressPercentage">0%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <form method="post" id="personalityForm">
+                {% csrf_token %}
+
+                <div class="question-container">
+                    <!-- Question 1: Extraversion -->
+                    <div class="question-card">
+                        <div class="question-number">1</div>
+                        <div class="question-text">I enjoy social gatherings and meeting new people</div>
+                        <div class="scale-labels">
+                            <span>Strongly Disagree</span>
+                            <span>Disagree</span>
+                            <span>Neutral</span>
+                            <span>Agree</span>
+                            <span>Strongly Agree</span>
+                        </div>
+                        <div class="radio-group">
+                            {% for i in "12345" %}
+                            <div class="radio-option">
+                                <input type="radio" id="q1_{{ i }}" name="question_1" value="{{ i }}" required>
+                                <label for="q1_{{ i }}" class="radio-label">
+                                    <span class="radio-number">{{ i }}</span>
+                                    <span class="radio-text">
+                                        {% if forloop.counter == 1 %}Strongly Disagree
+                                        {% elif forloop.counter == 2 %}Disagree
+                                        {% elif forloop.counter == 3 %}Neutral
+                                        {% elif forloop.counter == 4 %}Agree
+                                        {% else %}Strongly Agree{% endif %}
+                                    </span>
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Question 2: Agreeableness -->
+                    <div class="question-card">
+                        <div class="question-number">2</div>
+                        <div class="question-text">I am compassionate and eager to help others</div>
+                        <div class="scale-labels">
+                            <span>Strongly Disagree</span>
+                            <span>Disagree</span>
+                            <span>Neutral</span>
+                            <span>Agree</span>
+                            <span>Strongly Agree</span>
+                        </div>
+                        <div class="radio-group">
+                            {% for i in "12345" %}
+                            <div class="radio-option">
+                                <input type="radio" id="q2_{{ i }}" name="question_2" value="{{ i }}" required>
+                                <label for="q2_{{ i }}" class="radio-label">
+                                    <span class="radio-number">{{ i }}</span>
+                                    <span class="radio-text">
+                                        {% if forloop.counter == 1 %}Strongly Disagree
+                                        {% elif forloop.counter == 2 %}Disagree
+                                        {% elif forloop.counter == 3 %}Neutral
+                                        {% elif forloop.counter == 4 %}Agree
+                                        {% else %}Strongly Agree{% endif %}
+                                    </span>
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Question 3: Conscientiousness -->
+                    <div class="question-card">
+                        <div class="question-number">3</div>
+                        <div class="question-text">I am organized and always come prepared</div>
+                        <div class="scale-labels">
+                            <span>Strongly Disagree</span>
+                            <span>Disagree</span>
+                            <span>Neutral</span>
+                            <span>Agree</span>
+                            <span>Strongly Agree</span>
+                        </div>
+                        <div class="radio-group">
+                            {% for i in "12345" %}
+                            <div class="radio-option">
+                                <input type="radio" id="q3_{{ i }}" name="question_3" value="{{ i }}" required>
+                                <label for="q3_{{ i }}" class="radio-label">
+                                    <span class="radio-number">{{ i }}</span>
+                                    <span class="radio-text">
+                                        {% if forloop.counter == 1 %}Strongly Disagree
+                                        {% elif forloop.counter == 2 %}Disagree
+                                        {% elif forloop.counter == 3 %}Neutral
+                                        {% elif forloop.counter == 4 %}Agree
+                                        {% else %}Strongly Agree{% endif %}
+                                    </span>
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Question 4: Emotional Stability -->
+                    <div class="question-card">
+                        <div class="question-number">4</div>
+                        <div class="question-text">I remain calm and composed under pressure</div>
+                        <div class="scale-labels">
+                            <span>Strongly Disagree</span>
+                            <span>Disagree</span>
+                            <span>Neutral</span>
+                            <span>Agree</span>
+                            <span>Strongly Agree</span>
+                        </div>
+                        <div class="radio-group">
+                            {% for i in "12345" %}
+                            <div class="radio-option">
+                                <input type="radio" id="q4_{{ i }}" name="question_4" value="{{ i }}" required>
+                                <label for="q4_{{ i }}" class="radio-label">
+                                    <span class="radio-number">{{ i }}</span>
+                                    <span class="radio-text">
+                                        {% if forloop.counter == 1 %}Strongly Disagree
+                                        {% elif forloop.counter == 2 %}Disagree
+                                        {% elif forloop.counter == 3 %}Neutral
+                                        {% elif forloop.counter == 4 %}Agree
+                                        {% else %}Strongly Agree{% endif %}
+                                    </span>
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Question 5: Openness -->
+                    <div class="question-card">
+                        <div class="question-number">5</div>
+                        <div class="question-text">I enjoy exploring complex ideas and abstract theories</div>
+                        <div class="scale-labels">
+                            <span>Strongly Disagree</span>
+                            <span>Disagree</span>
+                            <span>Neutral</span>
+                            <span>Agree</span>
+                            <span>Strongly Agree</span>
+                        </div>
+                        <div class="radio-group">
+                            {% for i in "12345" %}
+                            <div class="radio-option">
+                                <input type="radio" id="q5_{{ i }}" name="question_5" value="{{ i }}" required>
+                                <label for="q5_{{ i }}" class="radio-label">
+                                    <span class="radio-number">{{ i }}</span>
+                                    <span class="radio-text">
+                                        {% if forloop.counter == 1 %}Strongly Disagree
+                                        {% elif forloop.counter == 2 %}Disagree
+                                        {% elif forloop.counter == 3 %}Neutral
+                                        {% elif forloop.counter == 4 %}Agree
+                                        {% else %}Strongly Agree{% endif %}
+                                    </span>
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Question 6: Extraversion -->
+                    <div class="question-card">
+                        <div class="question-number">6</div>
+                        <div class="question-text">I feel comfortable being the center of attention</div>
+                        <div class="scale-labels">
+                            <span>Strongly Disagree</span>
+                            <span>Disagree</span>
+                            <span>Neutral</span>
+                            <span>Agree</span>
+                            <span>Strongly Agree</span>
+                        </div>
+                        <div class="radio-group">
+                            {% for i in "12345" %}
+                            <div class="radio-option">
+                                <input type="radio" id="q6_{{ i }}" name="question_6" value="{{ i }}" required>
+                                <label for="q6_{{ i }}" class="radio-label">
+                                    <span class="radio-number">{{ i }}</span>
+                                    <span class="radio-text">
+                                        {% if forloop.counter == 1 %}Strongly Disagree
+                                        {% elif forloop.counter == 2 %}Disagree
+                                        {% elif forloop.counter == 3 %}Neutral
+                                        {% elif forloop.counter == 4 %}Agree
+                                        {% else %}Strongly Agree{% endif %}
+                                    </span>
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Question 7: Agreeableness -->
+                    <div class="question-card">
+                        <div class="question-number">7</div>
+                        <div class="question-text">I try to avoid conflicts and keep the peace</div>
+                        <div class="scale-labels">
+                            <span>Strongly Disagree</span>
+                            <span>Disagree</span>
+                            <span>Neutral</span>
+                            <span>Agree</span>
+                            <span>Strongly Agree</span>
+                        </div>
+                        <div class="radio-group">
+                            {% for i in "12345" %}
+                            <div class="radio-option">
+                                <input type="radio" id="q7_{{ i }}" name="question_7" value="{{ i }}" required>
+                                <label for="q7_{{ i }}" class="radio-label">
+                                    <span class="radio-number">{{ i }}</span>
+                                    <span class="radio-text">
+                                        {% if forloop.counter == 1 %}Strongly Disagree
+                                        {% elif forloop.counter == 2 %}Disagree
+                                        {% elif forloop.counter == 3 %}Neutral
+                                        {% elif forloop.counter == 4 %}Agree
+                                        {% else %}Strongly Agree{% endif %}
+                                    </span>
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Question 8: Conscientiousness -->
+                    <div class="question-card">
+                        <div class="question-number">8</div>
+                        <div class="question-text">I pay attention to details and follow a schedule</div>
+                        <div class="scale-labels">
+                            <span>Strongly Disagree</span>
+                            <span>Disagree</span>
+                            <span>Neutral</span>
+                            <span>Agree</span>
+                            <span>Strongly Agree</span>
+                        </div>
+                        <div class="radio-group">
+                            {% for i in "12345" %}
+                            <div class="radio-option">
+                                <input type="radio" id="q8_{{ i }}" name="question_8" value="{{ i }}" required>
+                                <label for="q8_{{ i }}" class="radio-label">
+                                    <span class="radio-number">{{ i }}</span>
+                                    <span class="radio-text">
+                                        {% if forloop.counter == 1 %}Strongly Disagree
+                                        {% elif forloop.counter == 2 %}Disagree
+                                        {% elif forloop.counter == 3 %}Neutral
+                                        {% elif forloop.counter == 4 %}Agree
+                                        {% else %}Strongly Agree{% endif %}
+                                    </span>
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Question 9: Emotional Stability -->
+                    <div class="question-card">
+                        <div class="question-number">9</div>
+                        <div class="question-text">I rarely worry or get anxious about things</div>
+                        <div class="scale-labels">
+                            <span>Strongly Disagree</span>
+                            <span>Disagree</span>
+                            <span>Neutral</span>
+                            <span>Agree</span>
+                            <span>Strongly Agree</span>
+                        </div>
+                        <div class="radio-group">
+                            {% for i in "12345" %}
+                            <div class="radio-option">
+                                <input type="radio" id="q9_{{ i }}" name="question_9" value="{{ i }}" required>
+                                <label for="q9_{{ i }}" class="radio-label">
+                                    <span class="radio-number">{{ i }}</span>
+                                    <span class="radio-text">
+                                        {% if forloop.counter == 1 %}Strongly Disagree
+                                        {% elif forloop.counter == 2 %}Disagree
+                                        {% elif forloop.counter == 3 %}Neutral
+                                        {% elif forloop.counter == 4 %}Agree
+                                        {% else %}Strongly Agree{% endif %}
+                                    </span>
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Question 10: Openness -->
+                    <div class="question-card">
+                        <div class="question-number">10</div>
+                        <div class="question-text">I am curious about many different things</div>
+                        <div class="scale-labels">
+                            <span>Strongly Disagree</span>
+                            <span>Disagree</span>
+                            <span>Neutral</span>
+                            <span>Agree</span>
+                            <span>Strongly Agree</span>
+                        </div>
+                        <div class="radio-group">
+                            {% for i in "12345" %}
+                            <div class="radio-option">
+                                <input type="radio" id="q10_{{ i }}" name="question_10" value="{{ i }}" required>
+                                <label for="q10_{{ i }}" class="radio-label">
+                                    <span class="radio-number">{{ i }}</span>
+                                    <span class="radio-text">
+                                        {% if forloop.counter == 1 %}Strongly Disagree
+                                        {% elif forloop.counter == 2 %}Disagree
+                                        {% elif forloop.counter == 3 %}Neutral
+                                        {% elif forloop.counter == 4 %}Agree
+                                        {% else %}Strongly Agree{% endif %}
+                                    </span>
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="btn-container">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-chart-line"></i> Complete Assessment
+                    </button>
+                    <a href="{% url 'dashboard' %}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Dashboard
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('personalityForm');
+        const progressFill = document.getElementById('progressFill');
+        const progressPercentage = document.getElementById('progressPercentage');
+        const totalQuestions = 10; // Update this based on actual question count
+        let answeredQuestions = 0;
+
+        function updateProgress() {
+            const radioButtons = form.querySelectorAll('input[type="radio"]:checked');
+            answeredQuestions = radioButtons.length;
+            const progress = (answeredQuestions / totalQuestions) * 100;
+            
+            progressFill.style.width = `${progress}%`;
+            progressPercentage.textContent = `${Math.round(progress)}%`;
+        }
+
+        // PEHLE CODE KA PROGRESS TRACKING
+        const radioButtons = form.querySelectorAll('input[type="radio"]');
+        radioButtons.forEach(radio => {
+            radio.addEventListener('change', updateProgress);
+        });
+
+        // DUSRE CODE KA CLICK FEATURE (Radio options par click se select)
+        const radioOptions = document.querySelectorAll('.radio-option');
+        radioOptions.forEach(option => {
+            option.addEventListener('click', function(e) {
+                const radio = this.querySelector('input[type="radio"]');
+                if (radio && !radio.checked) {
+                    radio.checked = true;
+                    // Progress update trigger karo
+                    radio.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+            });
+        });
+
+        // Initial progress update
+        updateProgress();
+
+        // PEHLE CODE KA FORM VALIDATION + RESULT PAGE
+        form.addEventListener('submit', function(e) {
+            const radioButtons = form.querySelectorAll('input[type="radio"]');
+            const questionGroups = {};
+            
+            // Group radio buttons by question
+            radioButtons.forEach(radio => {
+                const name = radio.name;
+                if (!questionGroups[name]) {
+                    questionGroups[name] = [];
+                }
+                questionGroups[name].push(radio);
+            });
+
+            // Check if all questions are answered
+            let allAnswered = true;
+            for (const question in questionGroups) {
+                const isAnswered = questionGroups[question].some(radio => radio.checked);
+                if (!isAnswered) {
+                    allAnswered = false;
+                    break;
+                }
+            }
+
+            if (!allAnswered) {
+                e.preventDefault();
+                alert('Please answer all questions before submitting the assessment.');
+            }
+            // Agar sab questions answered hai to form normally submit hoga
+            // aur result page khul jayega
+        });
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,871 @@
+
+
+{% load static %}
+{% include "logo.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Market Trends - AI Career Recommender</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #8B5FBF;
+            --secondary: #D4A5A5;
+            --success: #06D6A0;
+            --info: #118AB2;
+            --warning: #FFD166;
+            --danger: #EF476F;
+            --light: #F8F9FA;
+            --dark: #212529;
+            --sidebar-bg: #2D3047;
+            --card-bg: #FFFFFF;
+            --text-primary: #333333;
+            --text-secondary: #6C757D;
+            --gradient-primary: linear-gradient(135deg, #8B5FBF 0%, #6A4C93 100%);
+            --gradient-secondary: linear-gradient(135deg, #D4A5A5 0%, #C89595 100%);
+            --gradient-success: linear-gradient(135deg, #06D6A0 0%, #04B588 100%);
+            --gradient-warning: linear-gradient(135deg, #FFD166 0%, #FFC145 100%);
+            --gradient-info: linear-gradient(135deg, #118AB2 0%, #0A6E8F 100%);
+            --card-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            --hover-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #F5F7FA;
+            color: var(--text-primary);
+        }
+        
+        .sidebar {
+            min-height: 100vh;
+            background: var(--sidebar-bg);
+            box-shadow: 3px 0 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.85);
+            padding: 1rem 1.5rem;
+            margin: 0.25rem 1rem;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .sidebar .nav-link:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateX(5px);
+        }
+        
+        .sidebar .nav-link.active {
+            color: #fff;
+            background: var(--primary);
+            box-shadow: 0 5px 15px rgba(139, 95, 191, 0.3);
+        }
+        
+        .sidebar .nav-link i {
+            width: 24px;
+            text-align: center;
+        }
+        
+        .main-content {
+            background: #F5F7FA;
+            padding: 2rem;
+        }
+        
+        .dashboard-header {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--card-shadow);
+            border-left: 5px solid var(--primary);
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+            border-top: 4px solid transparent;
+            height: 100%;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--hover-shadow);
+        }
+        
+        .stat-card.careers {
+            border-top-color: var(--primary);
+        }
+        
+        .stat-card.growth {
+            border-top-color: var(--success);
+        }
+        
+        .stat-card.salary {
+            border-top-color: var(--warning);
+        }
+        
+        .stat-card.locations {
+            border-top-color: var(--info);
+        }
+        
+        .stat-card i {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            opacity: 0.8;
+        }
+        
+        .stat-card.careers i {
+            color: var(--primary);
+        }
+        
+        .stat-card.growth i {
+            color: var(--success);
+        }
+        
+        .stat-card.salary i {
+            color: var(--warning);
+        }
+        
+        .stat-card.locations i {
+            color: var(--info);
+        }
+        
+        .stat-card h3 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .chart-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--card-shadow);
+            height: 100%;
+        }
+        
+        .chart-card .card-header {
+            background: transparent;
+            border: none;
+            padding: 0 0 1rem 0;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .chart-card .card-header h5 {
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+        
+        .demand-badge {
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+        
+        .demand-high { 
+            background: rgba(6, 214, 160, 0.15); 
+            color: var(--success);
+            border: 1px solid rgba(6, 214, 160, 0.3);
+        }
+        
+        .demand-medium { 
+            background: rgba(255, 209, 102, 0.15); 
+            color: #B38B00;
+            border: 1px solid rgba(255, 209, 102, 0.3);
+        }
+        
+        .demand-low { 
+            background: rgba(239, 71, 111, 0.15); 
+            color: var(--danger);
+            border: 1px solid rgba(239, 71, 111, 0.3);
+        }
+        
+        .growth-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .growth-positive { background: var(--success); }
+        .growth-negative { background: var(--danger); }
+        
+        .salary-trend {
+            font-weight: bold;
+            color: var(--success);
+        }
+        
+        .skill-tag {
+            display: inline-block;
+            background: rgba(139, 95, 191, 0.1);
+            color: var(--primary);
+            padding: 0.25rem 0.75rem;
+            margin: 0.25rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            transition: all 0.2s ease;
+            border: 1px solid rgba(139, 95, 191, 0.2);
+        }
+        
+        .skill-tag:hover {
+            background: var(--primary);
+            color: white;
+            transform: scale(1.05);
+        }
+        
+        .location-badge {
+            background: rgba(17, 138, 178, 0.1);
+            color: var(--info);
+            padding: 0.25rem 0.75rem;
+            margin: 0.25rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            border: 1px solid rgba(17, 138, 178, 0.2);
+        }
+        
+        .career-item {
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            background: white;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+        
+        .career-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            border-left-color: var(--primary);
+        }
+        
+        .table th {
+            border-top: none;
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .table td {
+            vertical-align: middle;
+            padding: 1rem 0.75rem;
+        }
+        
+        .insight-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--card-shadow);
+            height: 100%;
+        }
+        
+        .insight-card .card-header {
+            background: transparent;
+            border: none;
+            padding: 0 0 1rem 0;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .insight-card .card-header h5 {
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .user-dropdown .btn {
+            border-radius: 10px;
+            padding: 0.5rem 1rem;
+            border: 1px solid #e9ecef;
+            background: white;
+            color: var(--dark);
+        }
+        
+        .user-dropdown .btn:hover {
+            background: #f8f9fa;
+        }
+        
+        .alert {
+            border-radius: 10px;
+            border: none;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .btn-action {
+            border-radius: 10px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-action:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .filter-dropdown .btn {
+            border-radius: 10px;
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 1rem;
+            }
+            
+            .dashboard-header {
+                padding: 1rem;
+            }
+            
+            .chart-container {
+                height: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 sidebar p-0">
+                <div class="p-3">
+                    <h5 class="text-white mb-4 pt-3">
+                        <i class="fas fa-robot me-2"></i>AI Career Guide
+                    </h5>
+                    <nav class="nav flex-column">
+                        <a class="nav-link" href="{% url 'dashboard' %}">
+                            <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                        </a>
+                        <a class="nav-link" href="{% url 'profile' %}">
+                            <i class="fas fa-user me-2"></i>Profile
+                        </a>
+                        <a class="nav-link" href="{% url 'resume' %}">
+                            <i class="fas fa-file-alt me-2"></i>Resume
+                        </a>
+                        <a class="nav-link" href="{% url 'skills' %}">
+                            <i class="fas fa-graduation-cap me-2"></i>Learning Hub
+                        </a>
+                        <a class="nav-link" href="{% url 'personality' %}">
+                            <i class="fas fa-brain me-2"></i>Personality
+                        </a>
+                        <a class="nav-link" href="{% url 'career_recommendations' %}">
+                            <i class="fas fa-briefcase me-2"></i>Careers
+                        </a>
+                        <a class="nav-link active" href="{% url 'trends' %}">
+                            <i class="fas fa-chart-line me-2"></i>Trends
+                        </a>
+                        <a class="nav-link" href="{% url 'chatbot' %}">
+                            <i class="fas fa-comments me-2"></i>Chatbot
+                        </a>
+                        <hr class="my-3 bg-light opacity-25">
+                        <a class="nav-link" href="{% url 'logout' %}">
+                            <i class="fas fa-sign-out-alt me-2"></i>Logout
+                        </a>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10 main-content p-0">
+                <!-- Header -->
+                <div class="dashboard-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h2 class="mb-1"><i class="fas fa-chart-line me-2" style="color: var(--primary);"></i>Job Market Trends</h2>
+                            <p class="text-muted mb-0">Real-time insights into career opportunities and market dynamics</p>
+                        </div>
+                        <div class="user-dropdown">
+                            <div class="dropdown">
+                                <button class="btn dropdown-toggle d-flex align-items-center" type="button" data-bs-toggle="dropdown">
+                                    <div class="rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px; background: var(--primary);">
+                                        <i class="fas fa-user text-white" style="font-size: 0.9rem;"></i>
+                                    </div>
+                                    <span>{{ user.username }}</span>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><a class="dropdown-item" href="{% url 'profile' %}">View Profile</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'edit_profile' %}">Edit Profile</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {% if error %}
+                <div class="alert alert-danger mx-3" role="alert">
+                    <i class="fas fa-exclamation-triangle me-2"></i>{{ error }}
+                </div>
+                {% endif %}
+
+                <div class="px-3">
+                    <!-- Market Overview Cards -->
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <div class="stat-card careers">
+                                <i class="fas fa-briefcase"></i>
+                                <h3>{{ total_careers|default:0 }}</h3>
+                                <p class="mb-0 text-muted">Career Fields Tracked</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-card growth">
+                                <i class="fas fa-chart-line"></i>
+                                <h3>{{ avg_growth|default:0|floatformat:1 }}%</h3>
+                                <p class="mb-0 text-muted">Average Growth Rate</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-card salary">
+                                <i class="fas fa-dollar-sign"></i>
+                                <h3>${{ avg_salary|default:0|floatformat:0 }}K</h3>
+                                <p class="mb-0 text-muted">Average Salary</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-card locations">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <h3>{{ unique_locations|default:0 }}</h3>
+                                <p class="mb-0 text-muted">Top Locations</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Charts Row -->
+                    <div class="row mb-4">
+                        <div class="col-md-8">
+                            <div class="chart-card">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0"><i class="fas fa-rocket me-2" style="color: var(--primary);"></i>Fastest Growing Careers</h5>
+                                    <div class="filter-dropdown">
+                                        <div class="dropdown">
+                                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                                Last 12 Months
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li><a class="dropdown-item" href="#">Last 6 Months</a></li>
+                                                <li><a class="dropdown-item" href="#">Last 12 Months</a></li>
+                                                <li><a class="dropdown-item" href="#">Last 24 Months</a></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="chart-container">
+                                    <canvas id="growthChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="chart-card">
+                                <div class="card-header">
+                                    <h5 class="mb-0"><i class="fas fa-chart-pie me-2" style="color: var(--primary);"></i>Demand Distribution</h5>
+                                </div>
+                                <div class="chart-container">
+                                    <canvas id="demandChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- High Demand Careers & Salary Trends -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="chart-card">
+                                <div class="card-header">
+                                    <h5 class="mb-0"><i class="fas fa-star me-2" style="color: var(--primary);"></i>High Demand Careers</h5>
+                                </div>
+                                <div class="career-list">
+                                    {% for trend in trends|slice:":5" %}
+                                    <div class="career-item">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="mb-1">{{ trend.career_title }}</h6>
+                                                <small class="text-muted">Avg Hiring: {{ trend.avg_hiring_time_days|default:"N/A" }} days</small>
+                                            </div>
+                                            <div class="text-end">
+                                                {% if trend.demand_level == "High" %}
+                                                <span class="demand-badge demand-high">High</span>
+                                                {% elif trend.demand_level == "Medium" %}
+                                                <span class="demand-badge demand-medium">Medium</span>
+                                                {% else %}
+                                                <span class="demand-badge demand-low">Low</span>
+                                                {% endif %}
+                                                <br>
+                                                <small style="color: var(--success);">
+                                                    <span class="growth-indicator growth-positive"></span>
+                                                    {{ trend.growth_rate|default:0|floatformat:"1" }}% growth
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% empty %}
+                                    <p class="text-muted text-center py-4">No high-demand careers found</p>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="chart-card">
+                                <div class="card-header">
+                                    <h5 class="mb-0"><i class="fas fa-money-bill-wave me-2" style="color: var(--primary);"></i>Salary Trends</h5>
+                                </div>
+                                <div class="chart-container">
+                                    <canvas id="salaryChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Career Details Table -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="chart-card">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0"><i class="fas fa-table me-2" style="color: var(--primary);"></i>Detailed Career Analysis</h5>
+                                    <div class="d-flex align-items-center">
+                                        <div class="form-check form-switch me-3">
+                                            <input class="form-check-input" type="checkbox" id="tableCompact">
+                                            <label class="form-check-label" for="tableCompact">Compact View</label>
+                                        </div>
+                                        <div class="filter-dropdown">
+                                            <div class="dropdown">
+                                                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                                    <i class="fas fa-filter me-1"></i>Filter
+                                                </button>
+                                                <ul class="dropdown-menu">
+                                                    <li><a class="dropdown-item" href="#">All Careers</a></li>
+                                                    <li><a class="dropdown-item" href="#">High Growth Only</a></li>
+                                                    <li><a class="dropdown-item" href="#">High Salary Only</a></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Career</th>
+                                                <th>Growth Rate</th>
+                                                <th>Avg. Salary</th>
+                                                <th>Top Locations</th>
+                                                <th>Key Skills</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for trend in trends %}
+                                            <tr>
+                                                <td>
+                                                    <strong>{{ trend.career_title }}</strong>
+                                                </td>
+                                                <td>
+                                                    <span class="{% if trend.growth_rate > 0 %}" style="color: var(--success);"{% else %}" style="color: var(--danger);"{% endif %}>
+                                                        <span class="growth-indicator {% if trend.growth_rate > 0 %}growth-positive{% else %}growth-negative{% endif %}"></span>
+                                                        {{ trend.growth_rate|floatformat:"1" }}%
+                                                    </span>
+                                                </td>
+                                                <td class="salary-trend">${{ trend.average_salary|floatformat:"0" }}</td>
+                                                <td>
+                                                    {% for location in trend.top_locations %}
+                                                         <span class="location-badge">{{ location }}</span>
+                                                    {% endfor %}
+
+                                                </td>
+                                                <td>
+                                                    {% for skill in trend.key_skills_in_demand %}
+                                                        <span class="skill-tag">{{ skill }}</span>
+                                                    {% endfor %}
+
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Market Insights -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="insight-card">
+                                <div class="card-header">
+                                    <h5 class="mb-0"><i class="fas fa-lightbulb me-2" style="color: var(--info);"></i>Market Insights</h5>
+                                </div>
+                                <div class="card-body">
+                                    <ul class="list-unstyled">
+                                        {% with highest_growth_trend=trends|first %}
+                                        <li class="mb-3 d-flex">
+                                            <i class="fas fa-check-circle me-2 mt-1" style="color: var(--success);"></i>
+                                            <div>
+                                                <strong>{{ highest_growth_trend.career_title|default:"N/A" }}</strong> shows the highest growth rate at {{ highest_growth_trend.growth_rate|default:0|floatformat:1 }}%
+                                            </div>
+                                        </li>
+                                        {% endwith %}
+
+                                        {% with highest_salary_trend=trends|slice:":1"|first %}
+                                        {% for trend in trends %}
+                                        {% if trend.average_salary > highest_salary_trend.average_salary %}
+                                        {% with highest_salary_trend=trend %}
+                                        {% endwith %}
+                                        {% endif %}
+                                        {% endfor %}
+                                        <li class="mb-3 d-flex">
+                                            <i class="fas fa-check-circle me-2 mt-1" style="color: var(--success);"></i>
+                                            <div>
+                                                <strong>{{ highest_salary_trend.career_title|default:"N/A" }}</strong> positions offer the highest average salaries at ${{ highest_salary_trend.average_salary|default:0|floatformat:0 }}
+                                            </div>
+                                        </li>
+                                        {% endwith %}
+
+                                        {% for trend in trends %}
+                                        {% if 'Remote' in trend.top_locations or 'remote' in trend.top_locations.lower %}
+                                        <li class="mb-3 d-flex">
+                                            <i class="fas fa-check-circle me-2 mt-1" style="color: var(--success);"></i>
+                                            <div>
+                                                <strong>{{ trend.career_title }}</strong> offers remote work opportunities
+                                            </div>
+                                        </li>
+                                        {% endif %}
+                                        {% endfor %}
+                                        
+                                        <li class="mb-3 d-flex">
+                                            <i class="fas fa-check-circle me-2 mt-1" style="color: var(--success);"></i>
+                                            <div>
+                                                Top tech hubs include major cities across the US with <strong>{{ unique_locations }}</strong> key locations
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="insight-card">
+                                <div class="card-header">
+                                    <h5 class="mb-0"><i class="fas fa-exclamation-triangle me-2" style="color: var(--warning);"></i>Skills in Demand</h5>
+                                </div>
+                                <div class="card-body">
+                                    {% with all_skills=trends|dictsort:"key_skills_in_demand" %}
+                                    <div class="mb-4">
+                                        <h6 class="mb-3">Most In-Demand Skills</h6>
+                                        <div>
+                                            {% for trend in trends|slice:":5" %}
+                                            {% for skill in trend.key_skills_in_demand|slice:":3" %}
+                                            {% if skill %}
+                                            <span class="skill-tag">{{ skill }}</span>
+                                            {% endif %}
+                                            {% endfor %}
+                                            {% endfor %}
+                                            {% if not trends %}
+                                            <span class="skill-tag">Python</span>
+                                            <span class="skill-tag">JavaScript</span>
+                                            <span class="skill-tag">SQL</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="mb-4">
+                                        <h6 class="mb-3">Emerging Skills</h6>
+                                        <div>
+                                            {% for trend in trends|slice:"5:8" %}
+                                            {% for skill in trend.key_skills_in_demand|slice:"3:5" %}
+                                            {% if skill %}
+                                            <span class="skill-tag">{{ skill }}</span>
+                                            {% endif %}
+                                            {% endfor %}
+                                            {% endfor %}
+                                            {% if not trends %}
+                                            <span class="skill-tag">AWS</span>
+                                            <span class="skill-tag">Docker</span>
+                                            <span class="skill-tag">React</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    {% endwith %}
+                                    <div class="mt-4">
+                                        <a href="{% url 'skill_gap_analysis' %}" class="btn btn-action" style="background: var(--primary); color: white;">
+                                            <i class="fas fa-search me-2"></i>Analyze Your Skill Gaps
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Data from Django context
+        const trends = [
+            {% for trend in trends %}
+            {
+                career: '{{ trend.career_title|escapejs }}',
+                growth: parseFloat('{{ trend.growth_rate|default:0 }}'),
+                salary: parseInt('{{ trend.average_salary|default:0 }}')
+            },
+            {% endfor %}
+        ];
+        
+        // --- Demand Level Distribution Chart ---
+        const demandCtx = document.getElementById('demandChart').getContext('2d');
+        const demandCounts = { 'High': 0, 'Medium': 0, 'Low': 0 };
+
+        trends.forEach(t => {
+            if (t.growth >= 10) {
+                demandCounts['High']++;
+            } else if (t.growth >= 5) {
+                demandCounts['Medium']++;
+            } else {
+                demandCounts['Low']++;
+            }
+        });
+        
+        const demandLabels = Object.keys(demandCounts);
+        const demandValues = Object.values(demandCounts);
+
+        if (demandValues.some(v => v > 0)) {
+            new Chart(demandCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: demandLabels,
+                    datasets: [{
+                        data: demandValues,
+                        backgroundColor: ['#06D6A0', '#FFD166', '#EF476F'],
+                        borderWidth: 0,
+                        hoverOffset: 15
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    },
+                    cutout: '70%'
+                }
+            });
+        }
+
+        // --- Growth Rate Chart ---
+        const growthCtx = document.getElementById('growthChart').getContext('2d');
+        const topGrowthCareers = trends.filter(t => t.growth > 0).sort((a, b) => b.growth - a.growth).slice(0, 5);
+
+        if (topGrowthCareers.length > 0) {
+            new Chart(growthCtx, {
+                type: 'bar',
+                data: {
+                    labels: topGrowthCareers.map(c => c.career),
+                    datasets: [{
+                        label: 'Growth Rate (%)',
+                        data: topGrowthCareers.map(c => c.growth),
+                        backgroundColor: 'rgba(139, 95, 191, 0.8)',
+                        borderColor: 'rgba(139, 95, 191, 1)',
+                        borderWidth: 1,
+                        borderRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Growth Rate (%)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // --- Salary Trends Chart ---
+        const salaryCtx = document.getElementById('salaryChart').getContext('2d');
+        const topSalaryCareers = trends.filter(t => t.salary > 0).sort((a, b) => b.salary - a.salary).slice(0, 8);
+        
+        if (topSalaryCareers.length > 0) {
+            new Chart(salaryCtx, {
+                type: 'line',
+                data: {
+                    labels: topSalaryCareers.map(c => c.career),
+                    datasets: [{
+                        label: 'Average Salary ($)',
+                        data: topSalaryCareers.map(c => c.salary),
+                        backgroundColor: 'rgba(255, 209, 102, 0.1)',
+                        borderColor: 'rgba(255, 209, 102, 1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: 'rgba(255, 209, 102, 1)',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Average Salary ($)'
+                            },
+                            ticks: {
+                                callback: function(value, index, values) {
+                                    return '$' + (value / 1000) + 'K';
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Compact table view toggle
+        document.getElementById('tableCompact').addEventListener('change', function() {
+            const table = document.querySelector('.table');
+            if (this.checked) {
+                table.classList.add('table-sm');
+            } else {
+                table.classList.remove('table-sm');
+            }
+        });
+    </script>
+</body>
+</html>

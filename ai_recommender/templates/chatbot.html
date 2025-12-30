@@ -1,0 +1,765 @@
+
+
+
+
+{% load static %}
+{% include "logo.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Career Chatbot - AI Career Recommender</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #8B5FBF;
+            --secondary: #D4A5A5;
+            --success: #06D6A0;
+            --info: #118AB2;
+            --warning: #FFD166;
+            --danger: #EF476F;
+            --light: #F8F9FA;
+            --dark: #212529;
+            --sidebar-bg: #2D3047;
+            --card-bg: #FFFFFF;
+            --text-primary: #333333;
+            --text-secondary: #6C757D;
+            --gradient-primary: linear-gradient(135deg, #8B5FBF 0%, #6A4C93 100%);
+            --gradient-secondary: linear-gradient(135deg, #D4A5A5 0%, #C89595 100%);
+            --gradient-success: linear-gradient(135deg, #06D6A0 0%, #04B588 100%);
+            --gradient-warning: linear-gradient(135deg, #FFD166 0%, #FFC145 100%);
+            --gradient-info: linear-gradient(135deg, #118AB2 0%, #0A6E8F 100%);
+            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --hover-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #F5F7FA 0%, #E4E7EB 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+        }
+
+        .sidebar {
+            min-height: 100vh;
+            background: var(--sidebar-bg);
+            box-shadow: 3px 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.85);
+            padding: 1rem 1.5rem;
+            margin: 0.25rem 1rem;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .sidebar .nav-link:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateX(5px);
+        }
+
+        .sidebar .nav-link.active {
+            color: #fff;
+            background: var(--primary);
+            box-shadow: 0 5px 15px rgba(139, 95, 191, 0.3);
+        }
+
+        .sidebar .nav-link i {
+            width: 24px;
+            text-align: center;
+        }
+
+        .main-content {
+            background: #F5F7FA;
+            padding: 2rem;
+        }
+
+        .dashboard-header {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--card-shadow);
+            border-left: 5px solid var(--primary);
+        }
+
+        .chat-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+            height: 75vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-header {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 1.5rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .chat-header-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .bot-avatar {
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 1.3rem;
+        }
+
+        .chat-status {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--success);
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 2rem;
+            background: #F8F9FA;
+        }
+
+        .message {
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: flex-start;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.bot {
+            justify-content: flex-start;
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message-content {
+            max-width: 70%;
+            padding: 1rem 1.5rem;
+            border-radius: 18px;
+            position: relative;
+            line-height: 1.5;
+        }
+
+        .message.bot .message-content {
+            background: white;
+            color: var(--text-primary);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            border-bottom-left-radius: 5px;
+        }
+
+        .message.user .message-content {
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: 0 4px 15px rgba(139, 95, 191, 0.3);
+            border-bottom-right-radius: 5px;
+        }
+
+        .message-time {
+            font-size: 0.75rem;
+            opacity: 0.7;
+            margin-top: 5px;
+        }
+
+        .quick-questions {
+            padding: 1.5rem 2rem;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            background: white;
+        }
+
+        .quick-questions h6 {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .questions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+
+        .quick-question {
+            background: rgba(139, 95, 191, 0.08);
+            border: 1px solid rgba(139, 95, 191, 0.2);
+            color: var(--primary);
+            padding: 10px 15px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .quick-question:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(139, 95, 191, 0.3);
+        }
+
+        .chat-input-container {
+            padding: 1.5rem 2rem;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            background: white;
+        }
+
+        .input-group {
+            background: rgba(139, 95, 191, 0.05);
+            border-radius: 15px;
+            padding: 5px;
+            border: 1px solid rgba(139, 95, 191, 0.1);
+        }
+
+        .chat-input {
+            border: none;
+            outline: none;
+            padding: 12px 20px;
+            font-size: 1rem;
+            background: transparent;
+            flex-grow: 1;
+        }
+
+        .send-btn {
+            background: var(--gradient-primary);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .send-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(139, 95, 191, 0.4);
+        }
+
+        .typing-indicator {
+            display: none;
+            align-items: center;
+            color: var(--text-secondary);
+            font-style: italic;
+            margin: 1rem 0;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 3px;
+            margin-left: 10px;
+        }
+
+        .typing-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--primary);
+            border-radius: 50%;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes typing {
+            0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+
+        .career-suggestion {
+            background: rgba(6, 214, 160, 0.1);
+            border: 1px solid rgba(6, 214, 160, 0.2);
+            border-radius: 12px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+
+        .suggestion-title {
+            color: var(--success);
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .user-dropdown .btn {
+            border-radius: 10px;
+            padding: 0.5rem 1rem;
+            border: 1px solid #e9ecef;
+            background: white;
+            color: var(--dark);
+        }
+
+        .user-dropdown .btn:hover {
+            background: #f8f9fa;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 1rem;
+            }
+            
+            .dashboard-header {
+                padding: 1rem;
+            }
+            
+            .chat-messages {
+                padding: 1rem;
+            }
+            
+            .message-content {
+                max-width: 85%;
+            }
+            
+            .questions-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .chat-header {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 sidebar p-0">
+                <div class="p-3">
+                    <h5 class="text-white mb-4 pt-3">
+                        <i class="fas fa-robot me-2"></i>AI Career Guide
+                    </h5>
+                    <nav class="nav flex-column">
+                        <a class="nav-link" href="{% url 'dashboard' %}">
+                            <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                        </a>
+                        <a class="nav-link" href="{% url 'profile' %}">
+                            <i class="fas fa-user me-2"></i>Profile
+                        </a>
+                        <a class="nav-link" href="{% url 'resume' %}">
+                            <i class="fas fa-file-alt me-2"></i>Resume
+                        </a>
+                        <a class="nav-link" href="{% url 'skills' %}">
+                            <i class="fas fa-graduation-cap me-2"></i>Learning Hub
+                        </a>
+                        <a class="nav-link" href="{% url 'personality' %}">
+                            <i class="fas fa-brain me-2"></i>Personality
+                        </a>
+                        <a class="nav-link" href="{% url 'career_recommendations' %}">
+                            <i class="fas fa-briefcase me-2"></i>Careers
+                        </a>
+                        <a class="nav-link" href="{% url 'trends' %}">
+                            <i class="fas fa-chart-line me-2"></i>Trends
+                        </a>
+                        <a class="nav-link active" href="{% url 'chatbot' %}">
+                            <i class="fas fa-comments me-2"></i>Chatbot
+                        </a>
+                        <hr class="my-3 bg-light opacity-25">
+                        <a class="nav-link" href="{% url 'logout' %}">
+                            <i class="fas fa-sign-out-alt me-2"></i>Logout
+                        </a>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10 main-content p-0">
+                <!-- Header -->
+                <div class="dashboard-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h2 class="mb-1"><i class="fas fa-comments me-2" style="color: var(--primary);"></i>AI Career Assistant</h2>
+                            <p class="text-muted mb-0">Get personalized career guidance and answers to your career questions</p>
+                        </div>
+                        <div class="user-dropdown">
+                            <div class="dropdown">
+                                <button class="btn dropdown-toggle d-flex align-items-center" type="button" data-bs-toggle="dropdown">
+                                    <div class="rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px; background: var(--primary);">
+                                        <i class="fas fa-user text-white" style="font-size: 0.9rem;"></i>
+                                    </div>
+                                    <span>{{ user.username }}</span>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><a class="dropdown-item" href="{% url 'profile' %}">View Profile</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'edit_profile' %}">Edit Profile</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="px-3">
+                    <!-- Chat Interface -->
+                    <div class="chat-container">
+                        <!-- Chat Header -->
+                        <div class="chat-header">
+                            <div class="chat-header-info">
+                                <div class="bot-avatar">
+                                    <i class="fas fa-robot"></i>
+                                </div>
+                                <div>
+                                    <h5 class="mb-1">Career Assistant</h5>
+                                    <p class="mb-0">AI-powered career guidance</p>
+                                </div>
+                            </div>
+                            <div class="chat-status">
+                                <span class="status-dot"></span>
+                                Online
+                            </div>
+                        </div>
+
+                        <!-- Chat Messages -->
+                        <div class="chat-messages" id="chatMessages">
+                            <!-- Welcome Message -->
+                            <div class="message bot">
+                                <div class="message-content">
+                                    <strong>👋 Hello {{ user.username }}!</strong>
+                                    <br><br>
+                                    I'm your AI Career Assistant, here to help you navigate your career journey. I can assist with:
+                                    <br><br>
+                                    <div class="career-suggestion">
+                                        <div class="suggestion-title">💼 Career Guidance</div>
+                                        • Personalized career recommendations<br>
+                                        • Skill development strategies<br>
+                                        • Market trend analysis
+                                    </div>
+                                    <div class="career-suggestion">
+                                        <div class="suggestion-title">📈 Professional Growth</div>
+                                        • Resume optimization tips<br>
+                                        • Interview preparation<br>
+                                        • Salary negotiation advice
+                                    </div>
+                                    <div class="career-suggestion">
+                                        <div class="suggestion-title">🎯 Personalized Support</div>
+                                        • Personality-based career matching<br>
+                                        • Learning path recommendations<br>
+                                        • Industry insights
+                                    </div>
+                                    <br>
+                                    What would you like to explore today?
+                                    <div class="message-time">Just now</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Typing Indicator -->
+                        <div class="typing-indicator" id="typingIndicator">
+                            <i class="fas fa-robot" style="color: var(--primary);"></i>
+                            Career Assistant is thinking
+                            <div class="typing-dots">
+                                <div class="typing-dot"></div>
+                                <div class="typing-dot"></div>
+                                <div class="typing-dot"></div>
+                            </div>
+                        </div>
+
+                        <!-- Quick Questions -->
+                        <div class="quick-questions" id="quickQuestions">
+                            <h6>Quick Questions</h6>
+                            <div class="questions-grid">
+                                <div class="quick-question" onclick="askQuestion('What careers match my skills?')">
+                                    <i class="fas fa-briefcase me-1"></i> Career Matches
+                                </div>
+                                <div class="quick-question" onclick="askQuestion('What skills should I learn?')">
+                                    <i class="fas fa-chart-line me-1"></i> Skill Development
+                                </div>
+                                <div class="quick-question" onclick="askQuestion('Show me market trends')">
+                                    <i class="fas fa-trending-up me-1"></i> Market Trends
+                                </div>
+                                <div class="quick-question" onclick="askQuestion('Help with my resume')">
+                                    <i class="fas fa-file-alt me-1"></i> Resume Help
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Chat Input -->
+                        <div class="chat-input-container">
+                            <div class="input-group">
+                                <input type="text" class="chat-input" id="messageInput" placeholder="Ask me anything about your career...">
+                                <button class="send-btn" onclick="sendMessage()">
+                                    <i class="fas fa-paper-plane"></i> Send
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const chatMessages = document.getElementById('chatMessages');
+        const messageInput = document.getElementById('messageInput');
+        const typingIndicator = document.getElementById('typingIndicator');
+        const quickQuestions = document.getElementById('quickQuestions');
+
+        // --- DYNAMIC DATA INJECTION ---
+        const chatbotData = JSON.parse('{{ chatbot_data|escapejs }}');
+        const userName = chatbotData.user_name;
+        const topCareers = chatbotData.top_careers;
+        const missingSkills = chatbotData.missing_skills;
+        const trendingCareers = chatbotData.trending_careers;
+        const personalityType = chatbotData.personality_type;
+
+        function askQuestion(question) {
+            // Add user message
+            addMessage(question, 'user');
+
+            // Hide quick questions temporarily
+            quickQuestions.style.display = 'none';
+
+            // Show typing indicator
+            typingIndicator.style.display = 'flex';
+
+            // Simulate AI response after delay
+            setTimeout(() => {
+                typingIndicator.style.display = 'none';
+                quickQuestions.style.display = 'block';
+                generateResponse(question);
+            }, 1500);
+        }
+
+        function sendMessage() {
+            const message = messageInput.value.trim();
+            if (message) {
+                askQuestion(message);
+                messageInput.value = '';
+            }
+        }
+
+        function addMessage(text, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+
+            const messageContent = document.createElement('div');
+            messageContent.className = 'message-content';
+            
+            const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            messageContent.innerHTML = `
+                ${text}
+                <div class="message-time">${time}</div>
+            `;
+
+            messageDiv.appendChild(messageContent);
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function generateResponse(userMessage) {
+            let response = '';
+            const lowerMessage = userMessage.toLowerCase();
+
+            if (lowerMessage.includes('career') || lowerMessage.includes('job') || lowerMessage.includes('match')) {
+                response = generateCareerResponse(userMessage);
+            } else if (lowerMessage.includes('skill') || lowerMessage.includes('learn') || lowerMessage.includes('develop')) {
+                response = generateSkillResponse(userMessage);
+            } else if (lowerMessage.includes('salary') || lowerMessage.includes('pay')) {
+                response = generateSalaryResponse(userMessage);
+            } else if (lowerMessage.includes('trend') || lowerMessage.includes('market')) {
+                response = generateTrendResponse(userMessage);
+            } else if (lowerMessage.includes('resume')) {
+                response = generateResumeResponse(userMessage);
+            } else if (lowerMessage.includes('personality')) {
+                response = generatePersonalityResponse(userMessage);
+            } else {
+                response = generateGeneralResponse(userMessage);
+            }
+
+            addMessage(response, 'bot');
+        }
+
+        function generateCareerResponse(message) {
+            let careerListHtml = '';
+            if (topCareers.length > 0) {
+                topCareers.forEach(career => {
+                    careerListHtml += `• **${career.title}** - ${career.match}% Match, ${career.salary} avg salary<br>`;
+                });
+            } else {
+                careerListHtml = "• No recommendations found yet. Please complete your profile.";
+            }
+
+            return `Based on your profile, here are your top career matches:
+
+🚀 **Your Top Recommendations:**
+${careerListHtml}
+
+💡 **Why these match:**
+• Aligned with your skills
+• Fits your personality type (${personalityType})
+• Strong market demand
+
+Would you like to explore specific skills for any of these roles?`;
+        }
+
+        function generateSkillResponse(message) {
+            let skillsHtml = '';
+            if (missingSkills.length > 0) {
+                missingSkills.forEach(skill => {
+                    skillsHtml += `• **${skill}**<br>`;
+                });
+            } else {
+                skillsHtml = "• You have a strong skill set! Consider advanced certifications.";
+            }
+
+            return `Here are the key skills you should focus on to reach your target career:
+
+🎯 **Priority Skills to Develop:**
+${skillsHtml}
+
+📚 **Learning Strategy:**
+• Focus on practical projects
+• Take online courses for these specific tools
+• Apply these skills in your current work if possible
+
+I can suggest specific courses if you're interested.`;
+        }
+
+        function generateSalaryResponse(message) {
+            let salaryHtml = '';
+            if (topCareers.length > 0) {
+                salaryHtml = `For your top match **${topCareers[0].title}**, the average salary is **${topCareers[0].salary}**.`;
+            } else {
+                salaryHtml = "Salary varies by role. Once you have career recommendations, I can give you specific figures.";
+            }
+
+            return `💰 **Salary Insights:**
+
+${salaryHtml}
+
+**General Tech Industry Ranges:**
+• Entry Level: $70K - $95K
+• Mid Level: $100K - $140K
+• Senior Level: $150K+
+
+**Negotiation Tip:** Always research the specific market rate for your location and experience level before discussing numbers.`;
+        }
+
+        function generateTrendResponse(message) {
+            let trendHtml = '';
+            if (trendingCareers.length > 0) {
+                trendingCareers.forEach(career => {
+                    trendHtml += `• **${career.title}** - ${career.growth}% Growth<br>`;
+                });
+            } else {
+                trendHtml = "• AI & Machine Learning<br>• Data Science<br>• Cloud Computing";
+            }
+
+            return `📈 **Current Market Trends:**
+
+🔥 **Fastest Growing Careers:**
+${trendHtml}
+
+💡 **Key Insight:**
+The market is shifting towards AI-driven and data-centric roles. Continuous learning is key to staying competitive.`;
+        }
+
+        function generateResumeResponse(message) {
+            return `📄 **Resume Optimization for ${userName}:**
+
+✅ **Quick Checks:**
+• Ensure your contact info is up to date.
+• Highlight your top skills: **${missingSkills.length > 0 ? 'Focus on adding ' + missingSkills[0] : 'Your skills look good!'}**.
+• Use action verbs (e.g., "Led", "Developed", "Optimized").
+
+🎯 **Tailoring:**
+Customize your resume for **${topCareers.length > 0 ? topCareers[0].title : 'your target role'}**. Match the keywords in the job description.
+
+Would you like me to review a specific section?`;
+        }
+
+        function generatePersonalityResponse(message) {
+            return `🧠 **Personality Insights:**
+
+**Your Type:** ${personalityType}
+
+**Strengths:**
+• Analytical thinking
+• Problem-solving
+• Adaptability
+
+**Work Style:**
+You likely thrive in environments that challenge you intellectually and offer opportunities for growth.
+
+**Career Alignment:**
+Your personality is well-suited for roles like **${topCareers.length > 0 ? topCareers[0].title : 'Technical Specialist'}**.`;
+        }
+
+        function generateGeneralResponse(message) {
+            return `I'm here to help you, ${userName}!
+
+I can provide personalized advice on:
+• **Your Career Matches** (e.g., ${topCareers.length > 0 ? topCareers[0].title : 'Software Engineer'})
+• **Skill Gaps** you need to fill
+• **Salary Expectations** for your target roles
+• **Market Trends** relevant to you
+
+What would you like to start with?`;
+        }
+
+        // Enter key to send message
+        messageInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        // Auto-focus on input
+        messageInput.focus();
+    </script>
+</body>
+</html>

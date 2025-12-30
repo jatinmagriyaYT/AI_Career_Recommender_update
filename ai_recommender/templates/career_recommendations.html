@@ -1,0 +1,629 @@
+{% load static %}
+{% include "logo.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Career Recommendations - AI Career System</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #8B5FBF;
+            --secondary: #D4A5A5;
+            --success: #06D6A0;
+            --info: #118AB2;
+            --warning: #FFD166;
+            --danger: #EF476F;
+            --light: #F8F9FA;
+            --dark: #212529;
+            --sidebar-bg: #2D3047;
+            --card-bg: #FFFFFF;
+            --text-primary: #333333;
+            --text-secondary: #6C757D;
+            --gradient-primary: linear-gradient(135deg, #8B5FBF 0%, #6A4C93 100%);
+            --gradient-success: linear-gradient(135deg, #06D6A0 0%, #04B588 100%);
+            --gradient-warning: linear-gradient(135deg, #FFD166 0%, #FFC145 100%);
+            --gradient-info: linear-gradient(135deg, #118AB2 0%, #0A6E8F 100%);
+            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --hover-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #F5F7FA 0%, #E4E7EB 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+
+        /* --- Header Styling --- */
+        .header-section {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .header-card {
+            background: white;
+            border-radius: 20px;
+            padding: 50px 40px;
+            box-shadow: var(--card-shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: var(--gradient-primary);
+        }
+
+        .header-card h1 {
+            color: var(--primary);
+            font-size: 2.8rem;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .header-card p {
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .ai-badge {
+            display: inline-flex;
+            align-items: center;
+            background: rgba(139, 95, 191, 0.1);
+            color: var(--primary);
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-top: 20px;
+        }
+
+        .ai-badge i {
+            margin-right: 8px;
+        }
+
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 15px 25px;
+            background: rgba(139, 95, 191, 0.05);
+            border-radius: 12px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* --- Grid & Card Styling --- */
+        .recommendations-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+
+        .career-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+            position: relative;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .career-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--hover-shadow);
+        }
+
+        /* Default Top Border */
+        .career-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: var(--gradient-primary); 
+        }
+        
+        /* Match Score Coloring Overrides */
+        .career-card.match-high::before { background: var(--gradient-success); }
+        .career-card.match-medium::before { background: var(--gradient-info); }
+        .career-card.match-low::before { background: var(--gradient-warning); }
+
+        .card-header {
+            padding: 25px 25px 20px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .career-title {
+            color: var(--primary);
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            line-height: 1.3;
+        }
+
+        .career-category {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .career-category i {
+            margin-right: 5px;
+            color: var(--info);
+        }
+
+        .match-score {
+            background: var(--gradient-success);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 10px rgba(6, 214, 160, 0.3);
+        }
+
+        /* Dynamic Score Colors */
+        .match-high .match-score { background: var(--gradient-success); box-shadow: 0 4px 10px rgba(6, 214, 160, 0.3); }
+        .match-medium .match-score { background: var(--gradient-info); box-shadow: 0 4px 10px rgba(17, 138, 178, 0.3); }
+        .match-low .match-score { background: var(--gradient-warning); box-shadow: 0 4px 10px rgba(255, 209, 102, 0.3); }
+
+        .card-body {
+            padding: 20px 25px;
+        }
+
+        .career-description {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 25px;
+            font-size: 0.95rem;
+        }
+
+        .career-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 15px;
+            background: rgba(139, 95, 191, 0.05);
+            border-radius: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .detail-item:hover {
+            background: rgba(139, 95, 191, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .detail-icon {
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+        }
+
+        .salary .detail-icon { color: var(--success); }
+        .growth .detail-icon { color: var(--info); }
+        .education .detail-icon { color: var(--warning); }
+        .demand .detail-icon { color: var(--danger); }
+
+        .detail-label {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .detail-value {
+            color: var(--text-primary);
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .demand-high { color: var(--success); font-weight: 700; }
+        .demand-medium { color: var(--info); font-weight: 700; }
+        .demand-low { color: var(--warning); font-weight: 700; }
+
+        .card-footer {
+            padding: 20px 25px;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .skills-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            max-width: 60%;
+        }
+
+        .skill-tag {
+            background: rgba(139, 95, 191, 0.1);
+            color: var(--primary);
+            padding: 5px 12px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .skill-tag:hover {
+            background: var(--primary);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .view-details-btn {
+            display: inline-flex;
+            align-items: center;
+            background: var(--gradient-primary);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(139, 95, 191, 0.3);
+        }
+
+        .view-details-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(139, 95, 191, 0.4);
+        }
+
+        .view-details-btn i {
+            margin-left: 8px;
+            transition: transform 0.3s ease;
+        }
+
+        .view-details-btn:hover i {
+            transform: translateX(3px);
+        }
+
+        /* --- Fallback/Error Styling --- */
+        .no-recommendations {
+            text-align: center;
+            padding: 60px 30px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .no-recommendations i {
+            font-size: 4rem;
+            color: var(--secondary);
+            margin-bottom: 20px;
+        }
+
+        .no-recommendations h3 {
+            color: var(--primary);
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+        }
+
+        .no-recommendations p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            max-width: 500px;
+            margin: 0 auto 30px;
+            line-height: 1.6;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 12px 25px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn.primary {
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: 0 4px 10px rgba(139, 95, 191, 0.3);
+        }
+
+        .action-btn.secondary {
+            background: rgba(139, 95, 191, 0.1);
+            color: var(--primary);
+            border: 1px solid rgba(139, 95, 191, 0.2);
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .action-btn.primary:hover {
+            box-shadow: 0 6px 15px rgba(139, 95, 191, 0.4);
+        }
+
+        .action-btn.secondary:hover {
+            background: rgba(139, 95, 191, 0.15);
+        }
+
+        .action-btn i {
+            margin-right: 8px;
+        }
+
+        .error {
+            background: rgba(239, 71, 111, 0.1);
+            border: 1px solid rgba(239, 71, 111, 0.3);
+            color: var(--danger);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+        }
+
+        .error i {
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+
+        .back-button {
+            margin-bottom: 30px;
+        }
+
+        .back-button a {
+            display: inline-flex;
+            align-items: center;
+            background: rgba(139, 95, 191, 0.1);
+            color: var(--primary);
+            padding: 12px 25px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(139, 95, 191, 0.2);
+        }
+
+        .back-button a:hover {
+            background: rgba(139, 95, 191, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .back-button a i {
+            margin-right: 8px;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .container { padding: 20px; }
+            .header-card { padding: 30px 20px; }
+            .header-card h1 { font-size: 2.2rem; }
+            .recommendations-grid { grid-template-columns: 1fr; }
+            .stats-bar { gap: 15px; }
+            .stat-item { padding: 12px 18px; }
+            .card-footer { flex-direction: column; gap: 15px; align-items: flex-start; }
+            .action-buttons { flex-direction: column; }
+            .action-btn { width: 100%; justify-content: center; }
+            .skills-tags { max-width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="back-button">
+            <a href="{% url 'dashboard' %}">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+
+        <div class="header-section">
+            <div class="header-card">
+                <h1>Your Career Recommendations</h1>
+                <p>AI-powered career matches tailored to your skills, personality, and goals</p>
+                <div class="ai-badge">
+                    <i class="fas fa-robot"></i>
+                    Powered by Advanced AI Matching
+                </div>
+                
+                <div class="stats-bar">
+                    <div class="stat-item">
+                        <div class="stat-value">{{ recommendations|length }}</div>
+                        <div class="stat-label">Career Matches</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">{{ avg_match_score }}%</div>
+                        <div class="stat-label">Avg. Match Score</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">{{ high_demand_roles }}</div>
+                        <div class="stat-label">High-Demand Roles</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% if error %}
+            <div class="error">
+                <i class="fas fa-exclamation-triangle"></i>
+                <div>{{ error }}</div>
+            </div>
+        {% endif %}
+
+        {% if recommendations %}
+            <div class="recommendations-grid">
+                {% for recommendation in recommendations %}
+                    {% with market=recommendation.market_data %}
+                        
+                        <div class="career-card 
+                            {% if recommendation.match_score >= 80 %}match-high
+                            {% elif recommendation.match_score >= 60 %}match-medium
+                            {% else %}match-low{% endif %}">
+                            
+                            <div class="card-header">
+                                <div>
+                                    <h3 class="career-title">{{ recommendation.recommended_career.title }}</h3>
+                                    <div class="career-category">
+                                        <i class="fas fa-tag"></i>
+                                        {{ recommendation.recommended_career.category|default:"Technology" }}
+                                    </div>
+                                </div>
+                                <span class="match-score">{{ recommendation.match_score }}% Match</span>
+                            </div>
+
+                            <div class="card-body">
+                                <div class="career-description">
+                                    {{ recommendation.recommended_career.description|default:"No description available"|truncatechars:180 }}
+                                </div>
+
+                                <div class="career-details">
+                                    <div class="detail-item salary">
+                                        <i class="fas fa-dollar-sign detail-icon"></i>
+                                        <div class="detail-label">Avg. Salary</div>
+                                        <div class="detail-value">${{ market.salary|default:"85,000" }}</div>
+                                    </div>
+                                    
+                                    <div class="detail-item growth">
+                                        <i class="fas fa-chart-line detail-icon"></i>
+                                        <div class="detail-label">Growth Rate</div>
+                                        <div class="detail-value">{{ market.growth_rate|default:"8.5" }}%</div>
+                                    </div>
+                                    
+                                    <div class="detail-item education">
+                                        <i class="fas fa-graduation-cap detail-icon"></i>
+                                        <div class="detail-label">Education</div>
+                                        <div class="detail-value">{{ recommendation.recommended_career.education_required|default:"Bachelor's" }}</div>
+                                    </div>
+                                    
+                                    <div class="detail-item demand">
+                                        <i class="fas fa-bolt detail-icon"></i>
+                                        <div class="detail-label">Demand</div>
+                                        <div class="detail-value demand-{{ market.demand_level|default:'medium'|lower }}">
+                                            {{ market.demand_level|default:"Medium" }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card-footer">
+                                <div class="skills-tags">
+                                    {% with recommendation.recommended_career.required_skills as skills_string %}
+                                        {% if skills_string %}
+                                            {% comment %} Splitting strictly by comma and limiting display {% endcomment %}
+                                            {% for skill_char in "x"|rjust:"3" %} 
+                                                {# Hack to loop 3 times is hard in pure templates without custom filters, so we just use the first few items blindly if possible or just display text #}
+                                            {% endfor %}
+                                            
+                                            {# Display full skills truncated or first few manually if split isn't available. #}
+                                            <span class="skill-tag" title="{{ skills_string }}">{{ skills_string|truncatechars:40 }}</span>
+                                        {% else %}
+                                            <span class="skill-tag">Analytical</span>
+                                            <span class="skill-tag">Problem Solving</span>
+                                        {% endif %}
+                                    {% endwith %}
+                                </div>
+                                <a href="{% url 'career_detail' recommendation.recommended_career.id %}" class="view-details-btn">
+                                    View Details <i class="fas fa-arrow-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                    {% endwith %}
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="no-recommendations">
+                <i class="fas fa-search"></i>
+                <h3>No Career Recommendations Yet</h3>
+                <p>Complete your profile and assessments to unlock personalized career matches based on your unique skills and preferences.</p>
+                <div class="action-buttons">
+                    <a href="{% url 'profile' %}" class="action-btn primary">
+                        <i class="fas fa-user-edit"></i> Complete Profile
+                    </a>
+                    <a href="{% url 'skills' %}" class="action-btn secondary">
+                        <i class="fas fa-chart-bar"></i> Skills Assessment
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Function to handle dynamic coloring based on demand level
+            const demandElements = document.querySelectorAll('.detail-item.demand .detail-value');
+            
+            demandElements.forEach(element => {
+                const demandLevel = element.textContent.trim().toLowerCase();
+                
+                // Reset classes first
+                element.className = 'detail-value';
+                
+                if (demandLevel === 'high') {
+                    element.classList.add('demand-high');
+                } else if (demandLevel === 'medium') {
+                    element.classList.add('demand-medium');
+                } else if (demandLevel === 'low') {
+                    element.classList.add('demand-low');
+                } else {
+                    element.classList.add('demand-medium'); 
+                }
+            });
+        });
+    </script>
+</body>
+</html>

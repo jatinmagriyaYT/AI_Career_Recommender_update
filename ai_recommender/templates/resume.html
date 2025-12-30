@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume Management - AI Career Recommender</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #8B5FBF;
+            --secondary: #D4A5A5;
+            --success: #06D6A0;
+            --info: #118AB2;
+            --warning: #FFD166;
+            --danger: #EF476F;
+            --light: #F8F9FA;
+            --dark: #212529;
+            --sidebar-bg: #2D3047;
+            --card-bg: #FFFFFF;
+            --text-primary: #333333;
+            --text-secondary: #6C757D;
+            --gradient-primary: linear-gradient(135deg, #8B5FBF 0%, #6A4C93 100%);
+            --gradient-secondary: linear-gradient(135deg, #D4A5A5 0%, #C89595 100%);
+            --gradient-success: linear-gradient(135deg, #06D6A0 0%, #04B588 100%);
+            --gradient-warning: linear-gradient(135deg, #FFD166 0%, #FFC145 100%);
+            --card-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            --hover-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #F5F7FA;
+            color: var(--text-primary);
+        }
+        
+        .sidebar {
+            min-height: 100vh;
+            background: var(--sidebar-bg);
+            box-shadow: 3px 0 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.85);
+            padding: 1rem 1.5rem;
+            margin: 0.25rem 1rem;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .sidebar .nav-link:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateX(5px);
+        }
+        
+        .sidebar .nav-link.active {
+            color: #fff;
+            background: var(--primary);
+            box-shadow: 0 5px 15px rgba(139, 95, 191, 0.3);
+        }
+        
+        .sidebar .nav-link i {
+            width: 24px;
+            text-align: center;
+        }
+        
+        .main-content {
+            background: #F5F7FA;
+            padding: 2rem;
+        }
+        
+        .dashboard-header {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--card-shadow);
+            border-left: 5px solid var(--primary);
+        }
+        
+        .resume-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+            height: 100%;
+            border-top: 4px solid transparent;
+        }
+        
+        .resume-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--hover-shadow);
+        }
+        
+        .resume-card.primary {
+            border-top-color: var(--primary);
+        }
+        
+        .resume-card.success {
+            border-top-color: var(--success);
+        }
+        
+        .resume-card.info {
+            border-top-color: var(--info);
+        }
+        
+        .resume-card.warning {
+            border-top-color: var(--warning);
+        }
+        
+        .upload-zone {
+            border: 2px dashed var(--primary);
+            border-radius: 15px;
+            padding: 3rem 2rem;
+            text-align: center;
+            background: rgba(139, 95, 191, 0.05);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .upload-zone:hover {
+            background: rgba(139, 95, 191, 0.1);
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+        
+        .upload-zone.dragover {
+            background: rgba(139, 95, 191, 0.15);
+            border-color: var(--primary);
+            transform: scale(1.02);
+        }
+        
+        .file-info {
+            background: rgba(139, 95, 191, 0.08);
+            padding: 1.25rem;
+            border-radius: 12px;
+            margin-top: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .file-info:hover {
+            background: rgba(139, 95, 191, 0.12);
+        }
+        
+        .analysis-result {
+            background: rgba(6, 214, 160, 0.08);
+            border: 1px solid rgba(6, 214, 160, 0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .analysis-result:hover {
+            background: rgba(6, 214, 160, 0.12);
+        }
+        
+        .skill-badge {
+            font-size: 0.8rem;
+            margin: 0.2rem;
+            padding: 0.4rem 0.8rem;
+            display: inline-block;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .skill-badge:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .current-resume-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .resume-stats {
+            background: var(--gradient-primary);
+            color: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+        }
+        
+        .resume-stats:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--hover-shadow);
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .skills-container {
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 1rem;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-radius: 12px;
+            background: rgba(139, 95, 191, 0.03);
+            transition: all 0.3s ease;
+        }
+        
+        .skills-container:hover {
+            background: rgba(139, 95, 191, 0.05);
+        }
+        
+        .skill-category {
+            margin-bottom: 1.5rem;
+        }
+        
+        .skill-category h6 {
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            padding-bottom: 0.5rem;
+            margin-bottom: 0.8rem;
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        .skill-group {
+            margin-bottom: 1rem;
+        }
+        
+        .skill-group-title {
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+        
+        /* Dynamic Skill Badge Colors */
+        .bg-prog { background-color: var(--primary) !important; color: white; }
+        .bg-db { background-color: var(--success) !important; color: white; }
+        .bg-cloud { background-color: var(--warning) !important; color: #333; }
+        .bg-tools { background-color: var(--info) !important; color: white; }
+        .bg-concept { background-color: #6f42c1 !important; color: white; }
+        
+        .user-dropdown .btn {
+            border-radius: 10px;
+            padding: 0.5rem 1rem;
+            border: 1px solid #e9ecef;
+            background: white;
+            color: var(--dark);
+        }
+        
+        .user-dropdown .btn:hover {
+            background: #f8f9fa;
+        }
+        
+        .alert {
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .btn-action {
+            border-radius: 10px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: none;
+        }
+        
+        .btn-action:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-primary-action {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-success-action {
+            background: var(--success);
+            color: white;
+        }
+        
+        .btn-info-action {
+            background: var(--info);
+            color: white;
+        }
+        
+        .btn-warning-action {
+            background: var(--warning);
+            color: #333;
+        }
+        
+        .progress {
+            height: 10px;
+            border-radius: 10px;
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+        
+        .progress-bar {
+            border-radius: 10px;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .slide-in-left {
+            animation: slideInLeft 0.5s ease-out;
+        }
+        
+        @keyframes slideInLeft {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 1rem;
+            }
+            
+            .dashboard-header {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 sidebar p-0">
+                <div class="p-3">
+                    <h5 class="text-white mb-4 pt-3">
+                        <i class="fas fa-robot me-2"></i>AI Career Guide
+                    </h5>
+                    <nav class="nav flex-column">
+                        <a class="nav-link" href="{% url 'dashboard' %}">
+                            <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                        </a>
+                        <a class="nav-link" href="{% url 'profile' %}">
+                            <i class="fas fa-user me-2"></i>Profile
+                        </a>
+                        <a class="nav-link active" href="{% url 'resume' %}">
+                            <i class="fas fa-file-alt me-2"></i>Resume
+                        </a>
+                        <a class="nav-link" href="{% url 'skills' %}">
+                            <i class="fas fa-graduation-cap me-2"></i>Learning Hub
+                        </a>
+                        <a class="nav-link" href="{% url 'personality' %}">
+                            <i class="fas fa-brain me-2"></i>Personality
+                        </a>
+                        <a class="nav-link" href="{% url 'career_recommendations' %}">
+                            <i class="fas fa-briefcase me-2"></i>Careers
+                        </a>
+                        <a class="nav-link" href="{% url 'trends' %}">
+                            <i class="fas fa-chart-line me-2"></i>Trends
+                        </a>
+                        <a class="nav-link" href="{% url 'chatbot' %}">
+                            <i class="fas fa-comments me-2"></i>Chatbot
+                        </a>
+                        <hr class="my-3 bg-light opacity-25">
+                        <a class="nav-link" href="{% url 'logout' %}">
+                            <i class="fas fa-sign-out-alt me-2"></i>Logout
+                        </a>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10 main-content p-0">
+                <!-- Header -->
+                <div class="dashboard-header fade-in">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h2 class="mb-1"><i class="fas fa-file-alt me-2" style="color: var(--primary);"></i>Resume Management</h2>
+                            <p class="text-muted mb-0">Upload and analyze your resume for better career recommendations</p>
+                        </div>
+                        <div class="user-dropdown">
+                            <div class="dropdown">
+                                <button class="btn dropdown-toggle d-flex align-items-center" type="button" data-bs-toggle="dropdown">
+                                    <div class="rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px; background: var(--primary);">
+                                        <i class="fas fa-user text-white" style="font-size: 0.9rem;"></i>
+                                    </div>
+                                    <span>{{ user.username }}</span>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><a class="dropdown-item" href="{% url 'profile' %}">View Profile</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'edit_profile' %}">Edit Profile</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="px-3">
+                    {% if messages %}
+                    <div class="mb-4 fade-in">
+                        {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                            <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'warning' %}exclamation-triangle{% elif message.tags == 'error' %}times-circle{% else %}info-circle{% endif %} me-2"></i>
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    {% if profile.resume_file %}
+                    <div class="row slide-in-left">
+                        <div class="col-12">
+                            <div class="resume-stats">
+                                <div class="row text-center">
+                                    <div class="col-md-3">
+                                        <div class="stat-number">{{ profile_skills|length|default:0 }}</div>
+                                        <div>Skills Extracted</div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="stat-number">{{ profile.experience_years|default:0 }}</div>
+                                        <div>Years Experience</div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="stat-number">
+                                            {% if profile.experience_years >= 5 %}
+                                                Senior
+                                            {% elif profile.experience_years >= 2 %}
+                                                Mid
+                                            {% else %}
+                                                Entry
+                                            {% endif %}
+                                        </div>
+                                        <div>Career Level</div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="stat-number">
+                                            {% with cnt=profile_skills|length %}
+                                                {% if cnt >= 8 %}
+                                                    High
+                                                {% elif cnt >= 4 %}
+                                                    Medium
+                                                {% else %}
+                                                    Low
+                                                {% endif %}
+                                            {% endwith %}
+                                        </div>
+                                        <div>Market Readiness</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="row">
+                        <!-- Current Resume -->
+                        <div class="col-md-6 mb-4">
+                            <div class="resume-card primary fade-in">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0"><i class="fas fa-file-contract me-2" style="color: var(--primary);"></i>Current Resume</h5>
+                                </div>
+                                <div class="card-body">
+                                    {% if profile.resume_file %}
+                                        <div class="file-info">
+                                            <div class="d-flex align-items-center mb-3">
+                                                {% if profile.resume_filename|lower|slice:"-4:" == ".pdf" %}
+                                                    <i class="fas fa-file-pdf text-danger me-3 fa-2x"></i>
+                                                {% else %}
+                                                    <i class="fas fa-file-word text-primary me-3 fa-2x"></i>
+                                                {% endif %}
+                                                <div>
+                                                    <strong class="d-block">{{ profile.resume_filename }}</strong>
+                                                    <small class="text-muted">
+                                                        Uploaded: {{ profile.resume_uploaded_at|date:"M d, Y H:i" }}
+                                                    </small>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="current-resume-actions">
+                                                <a href="{{ profile.resume_file.url }}" class="btn btn-sm btn-action btn-primary-action" target="_blank">
+                                                    <i class="fas fa-download me-1"></i>Download
+                                                </a>
+                                                <form method="post" style="display: inline;">
+                                                    {% csrf_token %}
+                                                    <button type="submit" name="delete_resume" class="btn btn-sm btn-action" style="background: var(--danger); color: white;" 
+                                                            onclick="return confirm('Are you sure you want to delete your resume? This action cannot be undone.')">
+                                                        <i class="fas fa-trash me-1"></i>Delete
+                                                    </button>
+                                                </form>
+                                                <button type="button" class="btn btn-sm btn-action btn-warning-action" onclick="scrollToUpload()">
+                                                    <i class="fas fa-sync-alt me-1"></i>Replace
+                                                </button>
+                                            </div>
+                                        </div>
+                                    {% else %}
+                                        <div class="text-center text-muted py-4">
+                                            <i class="fas fa-file-upload fa-3x mb-3 opacity-50"></i>
+                                            <h6>No Resume Uploaded</h6>
+                                            <p class="mb-0">Upload your resume to unlock personalized career recommendations</p>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+
+                        </div>
+
+                        <!-- Upload New Resume -->
+                        <div class="col-md-6 mb-4">
+                            <div class="resume-card success fade-in">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0"><i class="fas fa-cloud-upload-alt me-2" style="color: var(--success);"></i>Upload New Resume</h5>
+                                </div>
+                                <div class="card-body">
+                                    <form method="post" enctype="multipart/form-data" id="resumeForm">
+                                        {% csrf_token %}
+                                        
+                                        <input type="file" name="resume_file" id="id_resume_file" 
+                                                accept=".pdf,.docx,.doc" style="display: none;"
+                                                onchange="handleFileSelect(this.files[0])">
+                                        
+                                        <div class="upload-zone" id="uploadZone" onclick="document.getElementById('id_resume_file').click()">
+                                            <i class="fas fa-cloud-upload-alt fa-3x mb-3" style="color: var(--primary);"></i>
+                                            <h5>Drag & Drop your resume here</h5>
+                                            <p class="text-muted">or click to browse files</p>
+                                            <p class="small text-muted mt-2">
+                                                <i class="fas fa-info-circle me-1"></i>
+                                                PDF, DOCX • Max 10MB
+                                            </p>
+                                        </div>
+
+                                        <div id="fileInfo" class="mt-3" style="display: none;">
+                                            <div class="alert alert-info d-flex align-items-center">
+                                                <i class="fas fa-file-alt me-3 fa-lg"></i>
+                                                <div class="flex-grow-1">
+                                                    <strong id="fileName"></strong>
+                                                    <small class="text-muted d-block" id="fileSize"></small>
+                                                </div>
+                                                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="clearFileSelection()">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <div class="mt-3">
+                                            <button type="submit" class="btn btn-action btn-success-action w-100" id="uploadBtn" disabled>
+                                                <i class="fas fa-upload me-2"></i>Upload & Analyze Resume
+                                            </button>
+                                        </div>
+                                    </form>
+
+                                    <div class="mt-3" id="uploadProgress" style="display: none;">
+                                        <div class="progress">
+                                            <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" 
+                                                    role="progressbar" style="width: 100%">
+                                                Processing Resume...
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+
+                    {% if analysis %}
+                        <div class="row fade-in">
+                            <div class="col-12">
+                                <div class="resume-card info">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h5 class="mb-0"><i class="fas fa-chart-bar me-2" style="color: var(--info);"></i>AI Analysis Results</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="analysis-result">
+                                            {% if analysis.error %}
+                                                <div class="alert alert-danger">
+                                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                                    <strong>Analysis Error:</strong> {{ analysis.error }}
+                                                </div>
+                                            {% else %}
+                                                <div class="row">
+                                                    <div class="col-md-4">
+                                                        <h6><i class="fas fa-tags me-2" style="color: var(--primary);"></i>Skills Detected</h6>
+                                                        {% if analysis.skills %}
+                                                            <div class="skills-container mb-2">
+                                                                {% for skill in analysis.skills %}
+                                                                    <span class="badge bg-primary skill-badge">{{ skill }}</span>
+                                                                {% endfor %}
+                                                            </div>
+                                                            <div class="mt-2">
+                                                                <small class="text-muted">
+                                                                    <i class="fas fa-info-circle me-1"></i>
+                                                                    {{ analysis.skills|length }} skills found
+                                                                </small>
+                                                            </div>
+                                                        {% else %}
+                                                            <p class="text-muted">No skills detected in resume</p>
+                                                        {% endif %}
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <h6><i class="fas fa-briefcase me-2" style="color: var(--success);"></i>Experience Analysis</h6>
+                                                        <div class="d-flex align-items-center mb-3">
+                                                            <div class="display-6 text-primary me-3 pulse">{{ analysis.experience_years|default:0 }}</div>
+                                                            <div>
+                                                                <strong>Years</strong><br>
+                                                                <small class="text-muted">Professional Experience</small>
+                                                            </div>
+                                                        </div>
+                                                        <div class="mt-2">
+                                                            {% if analysis.experience_years >= 5 %}
+                                                                <span class="badge bg-success p-2">Senior Level</span>
+                                                            {% elif analysis.experience_years >= 2 %}
+                                                                <span class="badge bg-warning p-2">Mid Level</span>
+                                                            {% else %}
+                                                                <span class="badge bg-info p-2">Entry Level</span>
+                                                            {% endif %}
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <h6><i class="fas fa-robot me-2" style="color: var(--info);"></i>Analysis Quality</h6>
+                                                        <div class="mb-3">
+                                                            <div class="progress" style="height: 20px;">
+                                                                <div class="progress-bar bg-success" style="width: {% if analysis.analysis_method == 'ml_model' %}90%{% else %}75%{% endif %}">
+                                                                    {% if analysis.analysis_method == 'ml_model' %}High{% else %}Good{% endif %}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <small class="text-muted">
+                                                            <i class="fas fa-cogs me-1"></i>
+                                                            {{ analysis.analysis_method|title }} Analysis
+                                                        </small>
+                                                        <div class="mt-3">
+                                                            <a href="{% url 'skills' %}" class="btn btn-sm btn-action btn-primary-action">
+                                                                <i class="fas fa-plus me-1"></i>Add Missing Skills
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    {% if categorized_skills %} 
+                    <div class="row mt-4 fade-in">
+                        <div class="col-12">
+                            <div class="resume-card success">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0"><i class="fas fa-tags me-2" style="color: var(--success);"></i>Skills Breakdown by Category</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        {% for category_name, category_data in categorized_skills.items %}
+                                        <div class="col-md-4 mb-3">
+                                            <div class="skill-category">
+                                                <h6><i class="fas fa-{{ category_data.info.icon }} me-2"></i>{{ category_name }}</h6>
+                                                <div class="skills-container">
+                                                    {% for skill in category_data.skills %}
+                                                        <span class="badge bg-{{ category_data.info.color_class }} skill-badge">{{ skill }}</span>
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="row mt-4 fade-in">
+                        <div class="col-12">
+                            <div class="resume-card primary">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0"><i class="fas fa-lightbulb me-2" style="color: var(--primary);"></i>Resume Best Practices</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <h6><i class="fas fa-magic me-2" style="color: var(--primary);"></i>Optimize for AI</h6>
+                                            <ul class="list-unstyled small">
+                                                <li class="mb-2 d-flex align-items-start">
+                                                    <i class="fas fa-check text-success me-2 mt-1"></i>
+                                                    <span>Use standard job titles</span>
+                                                </li>
+                                                <li class="mb-2 d-flex align-items-start">
+                                                    <i class="fas fa-check text-success me-2 mt-1"></i>
+                                                    <span>Include specific technologies</span>
+                                                </li>
+                                                <li class="mb-2 d-flex align-items-start">
+                                                    <i class="fas fa-check text-success me-2 mt-1"></i>
+                                                    <span>Quantify achievements</span>
+                                                </li>
+                                                <li class="d-flex align-items-start">
+                                                    <i class="fas fa-check text-success me-2 mt-1"></i>
+                                                    <span>Clear section headings</span>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <h6><i class="fas fa-file-contract me-2" style="color: var(--success);"></i>Format Tips</h6>
+                                            <ul class="list-unstyled small">
+                                                <li class="mb-2 d-flex align-items-start">
+                                                    <i class="fas fa-file-pdf text-danger me-2 mt-1"></i>
+                                                    <span>PDF format recommended</span>
+                                                </li>
+                                                <li class="mb-2 d-flex align-items-start">
+                                                    <i class="fas fa-font text-info me-2 mt-1"></i>
+                                                    <span>Standard fonts (Arial, Calibri)</span>
+                                                </li>
+                                                <li class="mb-2 d-flex align-items-start">
+                                                    <i class="fas fa-columns text-warning me-2 mt-1"></i>
+                                                    <span>Single column layout</span>
+                                                </li>
+                                                <li class="d-flex align-items-start">
+                                                    <i class="fas fa-save text-primary me-2 mt-1"></i>
+                                                    <span>Keep under 10MB</span>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <h6><i class="fas fa-shield-alt me-2" style="color: var(--warning);"></i>Privacy & Security</h6>
+                                            <ul class="list-unstyled small">
+                                                <li class="mb-2 d-flex align-items-start">
+                                                    <i class="fas fa-lock text-success me-2 mt-1"></i>
+                                                    <span>Your data is secure</span>
+                                                </li>
+                                                <li class="mb-2 d-flex align-items-start">
+                                                    <i class="fas fa-eye-slash text-info me-2 mt-1"></i>
+                                                    <span>Private to your account</span>
+                                                </li>
+                                                <li class="mb-2 d-flex align-items-start">
+                                                    <i class="fas fa-trash text-danger me-2 mt-1"></i>
+                                                    <span>Delete anytime</span>
+                                                </li>
+                                                <li class="d-flex align-items-start">
+                                                    <i class="fas fa-sync text-primary me-2 mt-1"></i>
+                                                    <span>Replace when needed</span>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Drag and drop functionality
+        const uploadZone = document.getElementById('uploadZone');
+        const fileInput = document.getElementById('id_resume_file');
+        const fileInfo = document.getElementById('fileInfo');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const uploadProgress = document.getElementById('uploadProgress');
+
+        // Click to select file
+        uploadZone.addEventListener('click', (e) => {
+            if (!e.target.closest('#fileInfo')) {
+                fileInput.click();
+            }
+        });
+
+        // Drag and drop handlers
+        uploadZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadZone.classList.add('dragover');
+        });
+
+        uploadZone.addEventListener('dragleave', () => {
+            uploadZone.classList.remove('dragover');
+        });
+
+        uploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadZone.classList.remove('dragover');
+
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFileSelect(files[0]);
+            }
+        });
+
+        function handleFileSelect(file) {
+            if (file) {
+                // Validate file type
+                const validTypes = ['.pdf', '.docx', '.doc'];
+                const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
+                
+                if (!validTypes.includes(fileExtension)) {
+                    alert('Please select a PDF or DOCX file.');
+                    return;
+                }
+
+                // Validate file size (10MB)
+                if (file.size > 10 * 1024 * 1024) {
+                    alert('File size too large. Please select a file smaller than 10MB.');
+                    return;
+                }
+
+                // Set file to input
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(file);
+                fileInput.files = dataTransfer.files;
+
+                // Show file info
+                document.getElementById('fileName').textContent = file.name;
+                document.getElementById('fileSize').textContent = formatFileSize(file.size);
+                fileInfo.style.display = 'block';
+                
+                // Enable upload button
+                uploadBtn.disabled = false;
+
+                // Update upload zone appearance
+                uploadZone.innerHTML = `
+                    <i class="fas fa-file-check fa-3x text-success mb-3 pulse"></i>
+                    <h5>File Ready</h5>
+                    <p class="text-success">Click to select a different file</p>
+                `;
+            }
+        }
+
+        function clearFileSelection() {
+            fileInput.value = '';
+            fileInfo.style.display = 'none';
+            uploadBtn.disabled = true;
+            
+            // Reset upload zone
+            uploadZone.innerHTML = `
+                <i class="fas fa-cloud-upload-alt fa-3x mb-3" style="color: var(--primary);"></i>
+                <h5>Drag & Drop your resume here</h5>
+                <p class="text-muted">or click to browse files</p>
+                <p class="small text-muted mt-2">
+                    <i class="fas fa-info-circle me-1"></i>
+                    PDF, DOCX • Max 10MB
+                </p>
+            `;
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function scrollToUpload() {
+            document.getElementById('uploadZone').scrollIntoView({ 
+                behavior: 'smooth' 
+            });
+        }
+
+        // Form submission handler
+        document.getElementById('resumeForm').addEventListener('submit', function() {
+            uploadProgress.style.display = 'block';
+            uploadBtn.disabled = true;
+            uploadBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing...';
+        });
+
+        // Initialize tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+
+        // Add animation to elements when they come into view
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('fade-in');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        // Observe all cards for animation
+        document.querySelectorAll('.resume-card').forEach(card => {
+            observer.observe(card);
+        });
+
+    </script>
+</body>
+</html>

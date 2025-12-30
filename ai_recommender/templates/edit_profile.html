@@ -1,0 +1,717 @@
+{% load static %}
+{% include "logo.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Profile - AI Career System</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #8B5FBF;
+            --secondary: #D4A5A5;
+            --success: #06D6A0;
+            --info: #118AB2;
+            --warning: #FFD166;
+            --danger: #EF476F;
+            --light: #F8F9FA;
+            --dark: #212529;
+            --sidebar-bg: #2D3047;
+            --card-bg: #FFFFFF;
+            --text-primary: #333333;
+            --text-secondary: #6C757D;
+            --gradient-primary: linear-gradient(135deg, #8B5FBF 0%, #6A4C93 100%);
+            --gradient-secondary: linear-gradient(135deg, #D4A5A5 0%, #C89595 100%);
+            --gradient-success: linear-gradient(135deg, #06D6A0 0%, #04B588 100%);
+            --gradient-warning: linear-gradient(135deg, #FFD166 0%, #FFC145 100%);
+            --gradient-info: linear-gradient(135deg, #118AB2 0%, #0A6E8F 100%);
+            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --hover-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #F5F7FA 0%, #E4E7EB 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .form-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: var(--card-shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .form-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: var(--gradient-primary);
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .form-header h1 {
+            color: var(--primary);
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .form-header p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .form-section {
+            background: rgba(139, 95, 191, 0.05);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(139, 95, 191, 0.1);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(139, 95, 191, 0.1);
+        }
+
+        .section-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--gradient-primary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .section-title {
+            color: var(--primary);
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            display: block;
+            color: var(--text-primary);
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid rgba(139, 95, 191, 0.2);
+            border-radius: 12px;
+            background: white;
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(139, 95, 191, 0.1);
+        }
+
+        .form-control::placeholder {
+            color: var(--text-secondary);
+            opacity: 0.7;
+        }
+
+        select.form-control {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%238B5FBF' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            background-size: 12px;
+            appearance: none;
+            padding-right: 40px;
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 120px;
+            line-height: 1.5;
+        }
+
+        .file-upload {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .file-input {
+            position: absolute;
+            left: -9999px;
+        }
+
+        .file-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 14px 20px;
+            background: rgba(139, 95, 191, 0.1);
+            border: 2px dashed rgba(139, 95, 191, 0.3);
+            border-radius: 12px;
+            color: var(--primary);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .file-label:hover {
+            background: rgba(139, 95, 191, 0.15);
+            border-color: var(--primary);
+        }
+
+        .file-label i {
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+
+        .current-file {
+            margin-top: 10px;
+            padding: 12px 16px;
+            background: rgba(6, 214, 160, 0.1);
+            border: 1px solid rgba(6, 214, 160, 0.2);
+            border-radius: 8px;
+            color: var(--success);
+            font-weight: 500;
+        }
+
+        .current-file i {
+            margin-right: 8px;
+        }
+
+        .form-hint {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            margin-top: 6px;
+            line-height: 1.4;
+        }
+
+        .btn-container {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 40px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 15px 35px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: 0 4px 15px rgba(139, 95, 191, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(139, 95, 191, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(139, 95, 191, 0.1);
+            color: var(--primary);
+            border: 1px solid rgba(139, 95, 191, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(139, 95, 191, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .btn i {
+            margin-right: 8px;
+        }
+
+        .error {
+            background: rgba(239, 71, 111, 0.1);
+            border: 1px solid rgba(239, 71, 111, 0.3);
+            color: var(--danger);
+            padding: 16px 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+        }
+
+        .error i {
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+
+        .progress-indicator {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .progress-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            padding: 0 20px;
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            background: rgba(139, 95, 191, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-weight: 600;
+            margin-bottom: 8px;
+            border: 2px solid rgba(139, 95, 191, 0.2);
+        }
+
+        .step-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .progress-step.active .step-number {
+            background: var(--gradient-primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .progress-step.active .step-label {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .progress-step:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            top: 20px;
+            right: -10px;
+            width: 20px;
+            height: 2px;
+            background: rgba(139, 95, 191, 0.2);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .form-card {
+                padding: 25px;
+            }
+            
+            .form-header h1 {
+                font-size: 2rem;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .btn-container {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .progress-indicator {
+                flex-wrap: wrap;
+                gap: 15px;
+            }
+            
+            .progress-step:not(:last-child)::after {
+                display: none;
+            }
+        }
+
+        .skill-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .skill-tag {
+            background: rgba(139, 95, 191, 0.1);
+            color: var(--primary);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="form-card">
+            <div class="form-header">
+                <h1>Edit Your Profile</h1>
+                <p>Update your personal and professional information to get better career recommendations</p>
+            </div>
+
+            <!-- Progress Indicator -->
+            <div class="progress-indicator">
+                <div class="progress-step active">
+                    <div class="step-number">1</div>
+                    <div class="step-label">Personal Info</div>
+                </div>
+                <div class="progress-step active">
+                    <div class="step-number">2</div>
+                    <div class="step-label">Professional</div>
+                </div>
+                <div class="progress-step">
+                    <div class="step-number">3</div>
+                    <div class="step-label">Additional</div>
+                </div>
+            </div>
+
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="error" {% if message.tags == 'success' %}style="background: rgba(6, 214, 160, 0.1); color: var(--success); border-color: rgba(6, 214, 160, 0.3);"{% endif %}>
+                            <i class="fas {% if message.tags == 'success' %}fa-check-circle{% else %}fa-exclamation-triangle{% endif %}"></i>
+                            <div>{{ message }}</div>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                <!-- Personal Information Section -->
+                <div class="form-section">
+                    <div class="section-header">
+                        <div class="section-icon">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <h3 class="section-title">Personal Information</h3>
+                    </div>
+                    
+                    <!-- User Model Fields -->
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="{{ user_form.first_name.id_for_label }}" class="form-label">First Name</label>
+                            <input type="text" class="form-control" id="{{ user_form.first_name.id_for_label }}" name="{{ user_form.first_name.name }}" value="{{ user_form.first_name.value|default:'' }}" placeholder="First Name">
+                            {% if user_form.first_name.errors %}
+                                <div class="text-danger" style="color: var(--danger); font-size: 0.85rem; margin-top: 5px;">
+                                    {{ user_form.first_name.errors|join:", " }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="form-group">
+                            <label for="{{ user_form.last_name.id_for_label }}" class="form-label">Last Name</label>
+                            <input type="text" class="form-control" id="{{ user_form.last_name.id_for_label }}" name="{{ user_form.last_name.name }}" value="{{ user_form.last_name.value|default:'' }}" placeholder="Last Name">
+                            {% if user_form.last_name.errors %}
+                                <div class="text-danger" style="color: var(--danger); font-size: 0.85rem; margin-top: 5px;">
+                                    {{ user_form.last_name.errors|join:", " }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="{{ user_form.email.id_for_label }}" class="form-label">Email Address</label>
+                            <input type="email" class="form-control" id="{{ user_form.email.id_for_label }}" name="{{ user_form.email.name }}" value="{{ user_form.email.value|default:'' }}" placeholder="Email Address">
+                            {% if user_form.email.errors %}
+                                <div class="text-danger" style="color: var(--danger); font-size: 0.85rem; margin-top: 5px;">
+                                    {{ user_form.email.errors|join:", " }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="form-group">
+                            <label for="{{ profile_form.age.id_for_label }}" class="form-label">Age</label>
+                            <input type="number" class="form-control" id="{{ profile_form.age.id_for_label }}" name="{{ profile_form.age.name }}" value="{{ profile_form.age.value|default:'' }}" placeholder="Enter your age">
+                            {% if profile_form.age.errors %}
+                                <div class="text-danger" style="color: var(--danger); font-size: 0.85rem; margin-top: 5px;">
+                                    {{ profile_form.age.errors|join:", " }}
+                                </div>
+                            {% endif %}
+                            <div class="form-hint">Your age helps us provide age-appropriate career guidance</div>
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="{{ profile_form.gender.id_for_label }}" class="form-label">Gender</label>
+                            <select class="form-control" id="{{ profile_form.gender.id_for_label }}" name="{{ profile_form.gender.name }}">
+                                <option value="">Select Gender</option>
+                                <option value="M" {% if profile_form.gender.value == "M" %}selected{% endif %}>Male</option>
+                                <option value="F" {% if profile_form.gender.value == "F" %}selected{% endif %}>Female</option>
+                                <option value="O" {% if profile_form.gender.value == "O" %}selected{% endif %}>Other</option>
+                            </select>
+                            {% if profile_form.gender.errors %}
+                                <div class="text-danger" style="color: var(--danger); font-size: 0.85rem; margin-top: 5px;">
+                                    {{ profile_form.gender.errors|join:", " }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="form-group">
+                            <label for="{{ profile_form.education_level.id_for_label }}" class="form-label">Education Level</label>
+                            <select class="form-control" id="{{ profile_form.education_level.id_for_label }}" name="{{ profile_form.education_level.name }}">
+                                <option value="">Select Education Level</option>
+                                <option value="HS" {% if profile_form.education_level.value == "HS" %}selected{% endif %}>High School</option>
+                                <option value="UG" {% if profile_form.education_level.value == "UG" %}selected{% endif %}>Undergraduate</option>
+                                <option value="PG" {% if profile_form.education_level.value == "PG" %}selected{% endif %}>Postgraduate</option>
+                                <option value="PHD" {% if profile_form.education_level.value == "PHD" %}selected{% endif %}>PhD</option>
+                            </select>
+                            {% if profile_form.education_level.errors %}
+                                <div class="text-danger" style="color: var(--danger); font-size: 0.85rem; margin-top: 5px;">
+                                    {{ profile_form.education_level.errors|join:", " }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="{{ profile_form.experience_years.id_for_label }}" class="form-label">Years of Experience</label>
+                            <input type="number" class="form-control" id="{{ profile_form.experience_years.id_for_label }}" name="{{ profile_form.experience_years.name }}" value="{{ profile_form.experience_years.value|default:0 }}" min="0" max="50" placeholder="Years of professional experience">
+                            {% if profile_form.experience_years.errors %}
+                                <div class="text-danger" style="color: var(--danger); font-size: 0.85rem; margin-top: 5px;">
+                                    {{ profile_form.experience_years.errors|join:", " }}
+                                </div>
+                            {% endif %}
+                            <div class="form-hint">Total years in professional work environments</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="{{ profile_form.current_field.id_for_label }}" class="form-label">Current Field/Industry</label>
+                            <input type="text" class="form-control" id="{{ profile_form.current_field.id_for_label }}" name="{{ profile_form.current_field.name }}" value="{{ profile_form.current_field.value|default:'' }}" placeholder="e.g., Technology, Healthcare, Finance">
+                            {% if profile_form.current_field.errors %}
+                                <div class="text-danger" style="color: var(--danger); font-size: 0.85rem; margin-top: 5px;">
+                                    {{ profile_form.current_field.errors|join:", " }}
+                                </div>
+                            {% endif %}
+                            <div class="form-hint">Your current industry or field of work</div>
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="{{ profile_form.skills.id_for_label }}" class="form-label">Skills</label>
+                            <textarea class="form-control" id="{{ profile_form.skills.id_for_label }}" name="{{ profile_form.skills.name }}" placeholder="List your skills separated by commas (e.g., Python, Project Management, Data Analysis)">{{ profile_form.skills.value|default:'' }}</textarea>
+                            {% if profile_form.skills.errors %}
+                                <div class="text-danger" style="color: var(--danger); font-size: 0.85rem; margin-top: 5px;">
+                                    {{ profile_form.skills.errors|join:", " }}
+                                </div>
+                            {% endif %}
+                            <div class="form-hint">Separate multiple skills with commas</div>
+                            {% if profile_form.skills.value %}
+                            <div class="skill-tags" id="skillsPreview">
+                                <!-- Skills will be populated by JavaScript -->
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="{{ profile_form.interests.id_for_label }}" class="form-label">Career Interests</label>
+                            <textarea class="form-control" id="{{ profile_form.interests.id_for_label }}" name="{{ profile_form.interests.name }}" placeholder="Describe your career interests and goals">{{ profile_form.interests.value|default:'' }}</textarea>
+                            {% if profile_form.interests.errors %}
+                                <div class="text-danger" style="color: var(--danger); font-size: 0.85rem; margin-top: 5px;">
+                                    {{ profile_form.interests.errors|join:", " }}
+                                </div>
+                            {% endif %}
+                            <div class="form-hint">What type of work are you most interested in?</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Additional Information Section -->
+                <div class="form-section">
+                    <div class="section-header">
+                        <div class="section-icon">
+                            <i class="fas fa-info-circle"></i>
+                        </div>
+                        <h3 class="section-title">Additional Information</h3>
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="{{ profile_form.personality_type.id_for_label }}" class="form-label">Personality Type (MBTI)</label>
+                            <select class="form-control" id="{{ profile_form.personality_type.id_for_label }}" name="{{ profile_form.personality_type.name }}">
+                                <option value="">Select Personality Type</option>
+                                <option value="INTJ" {% if profile_form.personality_type.value == "INTJ" %}selected{% endif %}>INTJ - Architect</option>
+                                <option value="INTP" {% if profile_form.personality_type.value == "INTP" %}selected{% endif %}>INTP - Logician</option>
+                                <option value="ENTJ" {% if profile_form.personality_type.value == "ENTJ" %}selected{% endif %}>ENTJ - Commander</option>
+                                <option value="ENTP" {% if profile_form.personality_type.value == "ENTP" %}selected{% endif %}>ENTP - Debater</option>
+                                <option value="INFJ" {% if profile_form.personality_type.value == "INFJ" %}selected{% endif %}>INFJ - Advocate</option>
+                                <option value="INFP" {% if profile_form.personality_type.value == "INFP" %}selected{% endif %}>INFP - Mediator</option>
+                                <option value="ENFJ" {% if profile_form.personality_type.value == "ENFJ" %}selected{% endif %}>ENFJ - Protagonist</option>
+                                <option value="ENFP" {% if profile_form.personality_type.value == "ENFP" %}selected{% endif %}>ENFP - Campaigner</option>
+                                <option value="ISTJ" {% if profile_form.personality_type.value == "ISTJ" %}selected{% endif %}>ISTJ - Logistician</option>
+                                <option value="ISFJ" {% if profile_form.personality_type.value == "ISFJ" %}selected{% endif %}>ISFJ - Defender</option>
+                                <option value="ESTJ" {% if profile_form.personality_type.value == "ESTJ" %}selected{% endif %}>ESTJ - Executive</option>
+                                <option value="ESFJ" {% if profile_form.personality_type.value == "ESFJ" %}selected{% endif %}>ESFJ - Consul</option>
+                                <option value="ISTP" {% if profile_form.personality_type.value == "ISTP" %}selected{% endif %}>ISTP - Virtuoso</option>
+                                <option value="ISFP" {% if profile_form.personality_type.value == "ISFP" %}selected{% endif %}>ISFP - Adventurer</option>
+                                <option value="ESTP" {% if profile_form.personality_type.value == "ESTP" %}selected{% endif %}>ESTP - Entrepreneur</option>
+                                <option value="ESFP" {% if profile_form.personality_type.value == "ESFP" %}selected{% endif %}>ESFP - Entertainer</option>
+                            </select>
+                            {% if profile_form.personality_type.errors %}
+                                <div class="text-danger" style="color: var(--danger); font-size: 0.85rem; margin-top: 5px;">
+                                    {{ profile_form.personality_type.errors|join:", " }}
+                                </div>
+                            {% endif %}
+                            <div class="form-hint">Knowing your personality type helps match you with suitable careers</div>
+                        </div>
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Resume Upload</label>
+                            {% if user.userprofile.resume_file %}
+                                <div class="current-file">
+                                    <i class="fas fa-check-circle"></i>
+                                    Current file: {{ user.userprofile.resume_filename }}
+                                </div>
+                            {% endif %}
+                            <div class="file-upload">
+                                <input type="file" class="file-input" id="{{ profile_form.resume_file.id_for_label }}" name="{{ profile_form.resume_file.name }}" accept=".pdf,.doc,.docx">
+                                <label for="{{ profile_form.resume_file.id_for_label }}" class="file-label">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                    {% if user.userprofile.resume_file %}Update Resume{% else %}Upload Resume{% endif %}
+                                </label>
+                            </div>
+                            <div class="form-hint">PDF or DOCX files only, maximum 10MB</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="btn-container">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Save Changes
+                    </button>
+                    <a href="{% url 'profile' %}" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // File upload label text update
+        document.getElementById('{{ profile_form.resume_file.id_for_label }}').addEventListener('change', function(e) {
+            const fileName = e.target.files[0] ? e.target.files[0].name : 'Choose file';
+            document.querySelector('.file-label').innerHTML = `<i class="fas fa-cloud-upload-alt"></i> ${fileName}`;
+        });
+
+        // Skills tag preview - Initialize with existing skills
+        function updateSkillsPreview() {
+            const skillsContainer = document.getElementById('skillsPreview');
+            const skillsTextarea = document.getElementById('{{ profile_form.skills.id_for_label }}');
+            
+            if (skillsContainer && skillsTextarea) {
+                const skills = skillsTextarea.value.split(',').map(skill => skill.trim()).filter(skill => skill);
+                
+                skillsContainer.innerHTML = '';
+                skills.forEach(skill => {
+                    if (skill) {
+                        const tag = document.createElement('span');
+                        tag.className = 'skill-tag';
+                        tag.textContent = skill;
+                        skillsContainer.appendChild(tag);
+                    }
+                });
+            }
+        }
+
+        // Initialize skills preview on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            updateSkillsPreview();
+            
+            // Add event listener for skills input
+            const skillsTextarea = document.getElementById('{{ profile_form.skills.id_for_label }}');
+            if (skillsTextarea) {
+                skillsTextarea.addEventListener('input', updateSkillsPreview);
+            }
+        });
+
+        // Form validation
+        document.querySelector('form').addEventListener('submit', function(e) {
+            let isValid = true;
+            const requiredFields = document.querySelectorAll('[required]');
+            
+            requiredFields.forEach(field => {
+                if (!field.value.trim()) {
+                    isValid = false;
+                    field.style.borderColor = 'var(--danger)';
+                } else {
+                    field.style.borderColor = 'rgba(139, 95, 191, 0.2)';
+                }
+            });
+            
+            if (!isValid) {
+                e.preventDefault();
+                alert('Please fill in all required fields');
+            }
+        });
+    </script>
+</body>
+</html>

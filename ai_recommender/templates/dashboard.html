@@ -1,0 +1,742 @@
+{% load static %}
+{% include "logo.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - AI Career Recommender</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #8B5FBF;
+            --secondary: #D4A5A5;
+            --success: #06D6A0;
+            --info: #118AB2;
+            --warning: #FFD166;
+            --danger: #EF476F;
+            --light: #F8F9FA;
+            --dark: #212529;
+            --sidebar-bg: #2D3047;
+            --card-bg: #FFFFFF;
+            --text-primary: #333333;
+            --text-secondary: #6C757D;
+            --gradient-primary: linear-gradient(135deg, #8B5FBF 0%, #6A4C93 100%);
+            --gradient-secondary: linear-gradient(135deg, #D4A5A5 0%, #C89595 100%);
+            --gradient-success: linear-gradient(135deg, #06D6A0 0%, #04B588 100%);
+            --gradient-warning: linear-gradient(135deg, #FFD166 0%, #FFC145 100%);
+            --card-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            --hover-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #F5F7FA;
+            color: var(--text-primary);
+        }
+        
+        .sidebar {
+            min-height: 100vh;
+            background: var(--sidebar-bg);
+            box-shadow: 3px 0 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.85);
+            padding: 1rem 1.5rem;
+            margin: 0.25rem 1rem;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .sidebar .nav-link:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateX(5px);
+        }
+        
+        .sidebar .nav-link.active {
+            color: #fff;
+            background: var(--primary);
+            box-shadow: 0 5px 15px rgba(139, 95, 191, 0.3);
+        }
+        
+        .sidebar .nav-link i {
+            width: 24px;
+            text-align: center;
+        }
+        
+        .main-content {
+            background: #F5F7FA;
+            padding: 2rem;
+        }
+        
+        .dashboard-header {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--card-shadow);
+            border-left: 5px solid var(--primary);
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+            border-top: 4px solid transparent;
+            height: 100%;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--hover-shadow);
+        }
+        
+        .stat-card.profile {
+            border-top-color: var(--primary);
+        }
+        
+        .stat-card.skills {
+            border-top-color: var(--success);
+        }
+        
+        .stat-card.careers {
+            border-top-color: var(--info);
+        }
+        
+        .stat-card.experience {
+            border-top-color: var(--warning);
+        }
+        
+        .stat-card i {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            opacity: 0.8;
+        }
+        
+        .stat-card.profile i {
+            color: var(--primary);
+        }
+        
+        .stat-card.skills i {
+            color: var(--success);
+        }
+        
+        .stat-card.careers i {
+            color: var(--info);
+        }
+        
+        .stat-card.experience i {
+            color: var(--warning);
+        }
+        
+        .stat-card h3 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .content-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--card-shadow);
+            height: 100%;
+        }
+        
+        .content-card .card-header {
+            background: transparent;
+            border: none;
+            padding: 0 0 1rem 0;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .content-card .card-header h5 {
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .progress {
+            height: 10px;
+            border-radius: 10px;
+        }
+        
+        .progress-bar {
+            border-radius: 10px;
+        }
+        
+        .career-item {
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            background: white;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+        
+        .career-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            border-left-color: var(--primary);
+        }
+        
+        .badge-match {
+            background: rgba(6, 214, 160, 0.15);
+            color: var(--success);
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        
+        .badge-demand {
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+        
+        .badge-demand-high {
+            background: rgba(6, 214, 160, 0.15);
+            color: var(--success);
+            border: 1px solid rgba(6, 214, 160, 0.3);
+        }
+        
+        .badge-demand-medium {
+            background: rgba(255, 209, 102, 0.15);
+            color: #B38B00;
+            border: 1px solid rgba(255, 209, 102, 0.3);
+        }
+        
+        .badge-demand-low {
+            background: rgba(239, 71, 111, 0.15);
+            color: var(--danger);
+            border: 1px solid rgba(239, 71, 111, 0.3);
+        }
+        
+        .insight-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--card-shadow);
+            height: 100%;
+        }
+        
+        .insight-card .card-header {
+            background: transparent;
+            border: none;
+            padding: 0 0 1rem 0;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .insight-card .card-header h5 {
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .trending-career-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            border-left: 4px solid var(--primary);
+            height: 100%;
+        }
+        
+        .trending-career-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .user-dropdown .btn {
+            border-radius: 10px;
+            padding: 0.5rem 1rem;
+            border: 1px solid #e9ecef;
+            background: white;
+            color: var(--dark);
+        }
+        
+        .user-dropdown .btn:hover {
+            background: #f8f9fa;
+        }
+        
+        .alert {
+            border-radius: 10px;
+            border: none;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .btn-action {
+            border-radius: 10px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-action:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 1rem;
+            }
+            
+            .dashboard-header {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 sidebar p-0">
+                <div class="p-3">
+                    <h5 class="text-white mb-4 pt-3">
+                        <i class="fas fa-robot me-2"></i>AI Career Guide
+                    </h5>
+                    <nav class="nav flex-column">
+                        <a class="nav-link active" href="{% url 'dashboard' %}">
+                            <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                        </a>
+                        <a class="nav-link" href="{% url 'profile' %}">
+                            <i class="fas fa-user me-2"></i>Profile
+                        </a>
+                        <a class="nav-link" href="{% url 'resume' %}">
+                            <i class="fas fa-file-alt me-2"></i>Resume
+                        </a>
+                        <a class="nav-link" href="{% url 'skills' %}">
+                            <i class="fas fa-graduation-cap me-2"></i>Learning Hub
+                        </a>
+                        <a class="nav-link" href="{% url 'personality' %}">
+                            <i class="fas fa-brain me-2"></i>Personality
+                        </a>
+                        <a class="nav-link" href="{% url 'career_recommendations' %}">
+                            <i class="fas fa-briefcase me-2"></i>Careers
+                        </a>
+                        <a class="nav-link" href="{% url 'trends' %}">
+                            <i class="fas fa-chart-line me-2"></i>Trends
+                        </a>
+                        <a class="nav-link" href="{% url 'chatbot' %}">
+                            <i class="fas fa-comments me-2"></i>Chatbot
+                        </a>
+                        <hr class="my-3 bg-light opacity-25">
+                        <a class="nav-link" href="{% url 'logout' %}">
+                            <i class="fas fa-sign-out-alt me-2"></i>Logout
+                        </a>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10 main-content p-0">
+                <!-- Header -->
+                <div class="dashboard-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h2 class="mb-1"><i class="fas fa-tachometer-alt me-2" style="color: var(--primary);"></i>Dashboard</h2>
+                            <p class="text-muted mb-0">Welcome back! Here's your career development overview</p>
+                        </div>
+                        <div class="user-dropdown">
+                            <div class="dropdown">
+                                <button class="btn dropdown-toggle d-flex align-items-center" type="button" data-bs-toggle="dropdown">
+                                    <div class="rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px; background: var(--primary);">
+                                        <i class="fas fa-user text-white" style="font-size: 0.9rem;"></i>
+                                    </div>
+                                    <span>{{ user.username }}</span>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><a class="dropdown-item" href="{% url 'profile' %}">View Profile</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'edit_profile' %}">Edit Profile</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="px-3">
+                    <!-- Stats Cards -->
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <div class="stat-card profile">
+                                <i class="fas fa-user-check"></i>
+                                <h3>{{ profile_completion }}%</h3>
+                                <p class="mb-0 text-muted">Profile Match</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-card skills">
+                                <i class="fas fa-chart-bar"></i>
+                                <h3>{{ skills_count }}</h3>
+                                <p class="mb-0 text-muted">Skills Assessed</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-card careers">
+                                <i class="fas fa-briefcase"></i>
+                                <h3>{{ recommendations | length }}</h3>
+                                <p class="mb-0 text-muted">Career Matches</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-card experience">
+                                <i class="fas fa-clock"></i>
+                                <h3>{{ experience_years }}</h3>
+                                <p class="mb-0 text-muted">Years Experience</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- Profile Completion -->
+                        <div class="col-md-6 mb-4">
+                            <div class="content-card">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0"><i class="fas fa-user-check me-2" style="color: var(--primary);"></i>Profile Completion</h5>
+                                    <span class="badge rounded-pill" style="background: var(--primary);">{{ profile_completion }}%</span>
+                                </div>
+                                <div class="card-body">
+                                    {% if user.userprofile %}
+                                        {% if user.userprofile.age and user.userprofile.gender and user.userprofile.education_level %}
+                                            <div class="mb-3">
+                                                <div class="d-flex justify-content-between mb-1">
+                                                    <span>Basic Information</span>
+                                                    <span class="fw-bold" style="color: var(--success);">100%</span>
+                                                </div>
+                                                <div class="progress">
+                                                    <div class="progress-bar" style="width: 100%; background: var(--success);"></div>
+                                                </div>
+                                            </div>
+                                        {% else %}
+                                            <div class="mb-3">
+                                                <div class="d-flex justify-content-between mb-1">
+                                                    <span>Basic Information</span>
+                                                    <span class="fw-bold" style="color: var(--warning);">60%</span>
+                                                </div>
+                                                <div class="progress">
+                                                    <div class="progress-bar" style="width: 60%; background: var(--warning);"></div>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+
+                                        {% if skills_count > 0 %}
+                                            <div class="mb-3">
+                                                <div class="d-flex justify-content-between mb-1">
+                                                    <span>Skills Assessment</span>
+                                                    <span class="fw-bold" style="color: var(--success);">100%</span>
+                                                </div>
+                                                <div class="progress">
+                                                    <div class="progress-bar" style="width: 100%; background: var(--success);"></div>
+                                                </div>
+                                            </div>
+                                        {% else %}
+                                            <div class="mb-3">
+                                                <div class="d-flex justify-content-between mb-1">
+                                                    <span>Skills Assessment</span>
+                                                    <span class="fw-bold" style="color: var(--danger);">0%</span>
+                                                </div>
+                                                <div class="progress">
+                                                    <div class="progress-bar" style="width: 0%; background: var(--danger);"></div>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+
+                                        {% if user.userprofile and user.userprofile.resume_file %}
+                                            <div class="mb-3">
+                                                <div class="d-flex justify-content-between mb-1">
+                                                    <span>Resume Upload</span>
+                                                    <span class="fw-bold" style="color: var(--success);">100%</span>
+                                                </div>
+                                                <div class="progress">
+                                                    <div class="progress-bar" style="width: 100%; background: var(--success);"></div>
+                                                </div>
+                                            </div>
+                                        {% else %}
+                                            <div class="mb-3">
+                                                <div class="d-flex justify-content-between mb-1">
+                                                    <span>Resume Upload</span>
+                                                    <span class="fw-bold" style="color: var(--danger);">0%</span>
+                                                </div>
+                                                <div class="progress">
+                                                    <div class="progress-bar" style="width: 0%; background: var(--danger);"></div>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+
+                                        {% if user.userprofile.personality_type %}
+                                            <div class="mb-3">
+                                                <div class="d-flex justify-content-between mb-1">
+                                                    <span>Personality Test</span>
+                                                    <span class="fw-bold" style="color: var(--success);">100%</span>
+                                                </div>
+                                                <div class="progress">
+                                                    <div class="progress-bar" style="width: 100%; background: var(--success);"></div>
+                                                </div>
+                                            </div>
+                                        {% else %}
+                                            <div class="mb-3">
+                                                <div class="d-flex justify-content-between mb-1">
+                                                    <span>Personality Test</span>
+                                                    <span class="fw-bold" style="color: var(--danger);">0%</span>
+                                                </div>
+                                                <div class="progress">
+                                                    <div class="progress-bar" style="width: 0%; background: var(--danger);"></div>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                    {% else %}
+                                        <div class="mb-3">
+                                            <div class="d-flex justify-content-between mb-1">
+                                                <span>Complete your profile to see progress</span>
+                                                <span class="fw-bold text-muted">0%</span>
+                                            </div>
+                                            <div class="progress">
+                                                <div class="progress-bar bg-secondary" style="width: 0%"></div>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Recent Recommendations -->
+                        <div class="col-md-6 mb-4">
+                            <div class="content-card">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0"><i class="fas fa-briefcase me-2" style="color: var(--primary);"></i>Top Career Matches</h5>
+                                    <a href="{% url 'career_recommendations' %}" class="btn btn-sm btn-action" style="background: var(--primary); color: white;">View All</a>
+                                </div>
+                                <div class="card-body">
+                                    {% if top_recommendations %}
+                                        {% for recommendation in top_recommendations %}
+                                            <div class="career-item">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <div>
+                                                        <h6 class="mb-1">{{ recommendation.recommended_career.title }}</h6>
+                                                        <small class="text-muted">{{ recommendation.recommended_career.education_required }}</small>
+                                                    </div>
+                                                    <div class="text-end">
+                                                        <span class="badge-match">{{ recommendation.match_score }}% Match</span>
+                                                        <br>
+                                                        <small class="text-muted">${{ recommendation.recommended_career.average_salary|floatformat:"0" }}/year</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    {% else %}
+                                        <div class="text-center text-muted py-4">
+                                            <i class="fas fa-chart-line fa-2x mb-3" style="color: var(--secondary);"></i>
+                                            <p>No recommendations yet</p>
+                                            <p class="mb-0">Complete your profile to get personalized career recommendations</p>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Personalized Insights -->
+                    {% if personalized_insights %}
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="content-card">
+                                <div class="card-header">
+                                    <h5 class="mb-0"><i class="fas fa-lightbulb me-2" style="color: var(--warning);"></i>Personalized Insights</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        {% for insight in personalized_insights %}
+                                        <div class="col-md-4 mb-3">
+                                            <div class="alert h-100 d-flex align-items-center" style="background: rgba(255, 209, 102, 0.1); border-left: 4px solid var(--warning);">
+                                                <i class="{{ insight.icon }} me-3 fs-4" style="color: var(--warning);"></i>
+                                                <div>
+                                                    <h6 class="mb-1">{{ insight.title }}</h6>
+                                                    <p class="mb-0 small">{{ insight.message }}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Market Insights & Skill Alignment -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="insight-card">
+                                <div class="card-header">
+                                    <h5 class="mb-0"><i class="fas fa-chart-line me-2" style="color: var(--info);"></i>Market Insights</h5>
+                                </div>
+                                <div class="card-body">
+                                    {% if market_insights.matching_careers_count %}
+                                    <div class="mb-4">
+                                        <h6><i class="fas fa-bullseye me-2" style="color: var(--info);"></i>Your Skills Match {{ market_insights.matching_careers_count }} Careers</h6>
+                                        <p class="text-muted">Average salary: <strong>${{ market_insights.average_salary|floatformat:"0" }}</strong></p>
+                                        <p class="text-muted">Average growth: <strong>{{ market_insights.average_growth }}%</strong></p>
+                                    </div>
+                                    {% endif %}
+                                    <div class="mb-4">
+                                        <h6><i class="fas fa-fire me-2" style="color: var(--danger);"></i>Trending in Your Field</h6>
+                                        <p class="text-muted">Market demand: 
+                                            <span class="badge-demand 
+                                                {% if market_insights.demand_level == 'High' or market_insights.demand_level == 'Very High' %}badge-demand-high
+                                                {% elif market_insights.demand_level == 'Medium' %}badge-demand-medium
+                                                {% else %}badge-demand-low{% endif %}">
+                                                {{ market_insights.demand_level }}
+                                            </span>
+                                        </p>
+                                    </div>
+                                    <a href="{% url 'trends' %}" class="btn btn-action" style="background: var(--info); color: white;">
+                                        <i class="fas fa-chart-line me-2"></i>View Market Trends
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="insight-card">
+                                <div class="card-header">
+                                    <h5 class="mb-0"><i class="fas fa-search me-2" style="color: var(--warning);"></i>Skill Alignment Analysis</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-4">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span>Skill Match Score</span>
+                                            <span class="badge rounded-pill 
+                                                {% if skill_match_score >= 80 %}style="background: var(--success);"
+                                                {% elif skill_match_score >= 50 %}style="background: var(--warning); color: #333;"
+                                                {% else %}style="background: var(--danger);"
+                                                {% endif %}">
+                                                {{ skill_match_score }}%
+                                            </span>
+                                        </div>
+                                        <div class="progress mt-2">
+                                            <div class="progress-bar 
+                                                {% if skill_match_score >= 80 %}style="background: var(--success);"
+                                                {% elif skill_match_score >= 50 %}style="background: var(--warning);"
+                                                {% else %}style="background: var(--danger);"
+                                                {% endif %}"
+                                                style="width: {{ skill_match_score }}%">
+                                            </div>
+                                        </div>
+                                        <small class="text-muted mt-2 d-block">
+                                            {% if skill_match_score >= 80 %}
+                                                Excellent! Your skills are well-aligned with market demands.
+                                            {% elif skill_match_score >= 50 %}
+                                                Good match, but consider developing additional skills to improve your prospects.
+                                            {% else %}
+                                                Consider skill development to improve your career prospects.
+                                            {% endif %}
+                                        </small>
+                                    </div>
+                                    <a href="{% url 'skill_gap_analysis' %}" class="btn btn-action" style="background: var(--warning); color: #333;">
+                                        <i class="fas fa-search me-2"></i>Analyze Skill Gaps
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Trending Careers for User -->
+                    {% if trending_jobs %}
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="content-card">
+                                <div class="card-header">
+                                    <h5 class="mb-0"><i class="fas fa-rocket me-2" style="color: var(--primary);"></i>Trending Careers for You</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        {% for career in trending_jobs %}
+                                        <div class="col-md-4 mb-3">
+                                            <div class="trending-career-card">
+                                                <h6 class="card-title">{{ career.title }}</h6>
+                                                <p class="card-text mb-2">
+                                                    <span class="badge-demand badge-demand-high">
+                                                        {{ career.industry }}
+                                                    </span>
+                                                </p>
+                                                <p class="mb-2">
+                                                    <strong>Trend Score: {{ career.score }}/100</strong>
+                                                </p>
+                                                <p class="mb-3 small text-muted">
+                                                    {{ career.reason|truncatechars:60 }}
+                                                </p>
+                                                <a href="{% url 'career_recommendations' %}" class="btn btn-sm btn-action" style="background: var(--primary); color: white;">
+                                                    Learn More
+                                                </a>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Quick Actions -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="content-card">
+                                <div class="card-header">
+                                    <h5 class="mb-0"><i class="fas fa-bolt me-2" style="color: var(--primary);"></i>Quick Actions</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row g-3">
+                                        <div class="col-md-3">
+                                            <a href="{% url 'resume' %}" class="btn btn-action w-100 d-flex flex-column align-items-center py-3" style="background: rgba(139, 95, 191, 0.1); color: var(--primary); border: 1px solid rgba(139, 95, 191, 0.3);">
+                                                <i class="fas fa-file-upload mb-2 fs-4"></i>
+                                                <span>Upload Resume</span>
+                                            </a>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <a href="{% url 'skills' %}" class="btn btn-action w-100 d-flex flex-column align-items-center py-3" style="background: rgba(6, 214, 160, 0.1); color: var(--success); border: 1px solid rgba(6, 214, 160, 0.3);">
+                                                <i class="fas fa-chart-bar mb-2 fs-4"></i>
+                                                <span>Assess Skills</span>
+                                            </a>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <a href="{% url 'personality' %}" class="btn btn-action w-100 d-flex flex-column align-items-center py-3" style="background: rgba(255, 209, 102, 0.1); color: #B38B00; border: 1px solid rgba(255, 209, 102, 0.3);">
+                                                <i class="fas fa-brain mb-2 fs-4"></i>
+                                                <span>Personality Test</span>
+                                            </a>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <a href="{% url 'trends' %}" class="btn btn-action w-100 d-flex flex-column align-items-center py-3" style="background: rgba(17, 138, 178, 0.1); color: var(--info); border: 1px solid rgba(17, 138, 178, 0.3);">
+                                                <i class="fas fa-chart-line mb-2 fs-4"></i>
+                                                <span>Market Trends</span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

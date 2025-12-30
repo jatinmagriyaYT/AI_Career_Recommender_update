@@ -1,0 +1,284 @@
+
+
+
+
+{% load static %}
+{% include "logo.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="image/fevicon.png" type="image/png">
+    <title>Welcome to AI Career System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-image: url(https://jitechno.com/assets/images/slider/slide1.jpg);
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            min-height: 100vh; /* Ensure background covers full height */
+            color: #ffffff; /* Default text color for the page */
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Navigation Bar */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px 7%; /* Adjust padding as needed */
+            background-color: rgba(0, 0, 0, 0.6); /* Slightly darker, translucent background for navbar */
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px); /* Optional: Frosted glass effect for navbar */
+        }
+
+        .navbar .logo img {
+             height: 100px; /* Adjust logo height as needed */
+             opacity: 1; /* Full opacity for clarity */
+             mix-blend-mode: screen; /* Better for removing white background */
+             {% comment %} filter: contrast(1.5) brightness(0.8) invert(1); /* Remove white, show only dark parts */ {% endcomment %}
+             
+             background: transparent; /* Ensure transparent background */
+         }
+
+        .navbar .nav-links {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+        }
+
+        .navbar .nav-links li {
+            margin-left: 30px; /* Space between nav items */
+        }
+
+        .navbar .nav-links a {
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.1em;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+
+        .navbar .nav-links a:hover {
+            color: #00aaff; /* Highlight color on hover */
+        }
+
+        .navbar .nav-links a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            display: block;
+            margin-top: 5px;
+            right: 0;
+            background: #00aaff;
+            transition: width 0.3s ease;
+            -webkit-transition: width 0.3s ease;
+        }
+
+        .navbar .nav-links a:hover::after {
+            width: 100%;
+            left: 0;
+            background: #00aaff;
+        }
+
+        /* Hero Section - Main content area */
+        .hero-section {
+            flex-grow: 1; /* Allows it to take up remaining vertical space */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 50px 20px;
+        }
+
+        .hero-section h1 {
+             font-size: 3.5em; /* Large heading */
+             margin-bottom: 20px;
+             text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8); /* Stronger shadow for main title */
+             color: #ffffff;
+             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+             font-weight: 700;
+             letter-spacing: 1px;
+             overflow: hidden;
+             border-right: 3px solid #00aaff;
+             white-space: nowrap;
+             animation: blink-caret 0.75s step-end infinite;
+         }
+
+         .hero-section p {
+              font-size: 1.3em;
+              max-width: 900px;
+              line-height: 1.7;
+              text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.7);
+              margin-bottom: 50px;
+              font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+              font-weight: 400;
+              overflow: visible;
+              white-space: normal;
+              text-align: center;
+          }
+
+         @keyframes blink-caret {
+             from, to { border-color: transparent; }
+             50% { border-color: #00aaff; }
+         }
+
+        .hero-section .cta-button {
+             display: inline-block;
+             background: linear-gradient(135deg, #007bff 0%, #00aaff 100%);
+             color: white;
+             padding: 14px 32px;
+             border-radius: 25px;
+             text-decoration: none;
+             font-size: 1.1em;
+             font-weight: 600;
+             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+             letter-spacing: 0.5px;
+             transition: all 0.3s ease;
+             box-shadow: 0 6px 20px rgba(0, 123, 255, 0.3);
+             border: 2px solid transparent;
+             position: relative;
+             overflow: hidden;
+         }
+
+         .hero-section .cta-button::before {
+             content: '';
+             position: absolute;
+             top: 0;
+             left: -100%;
+             width: 100%;
+             height: 100%;
+             background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+             transition: left 0.5s;
+         }
+
+         .hero-section .cta-button:hover::before {
+             left: 100%;
+         }
+
+         .hero-section .cta-button:hover {
+             background: linear-gradient(135deg, #0056b3 0%, #0088cc 100%);
+             transform: translateY(-2px) scale(1.02);
+             box-shadow: 0 8px 25px rgba(0, 123, 255, 0.5);
+             border: 2px solid rgba(255, 255, 255, 0.2);
+         }
+
+        /* Basic Footer */
+        .footer {
+            padding: 20px;
+            text-align: center;
+            background-color: rgba(0, 0, 0, 0.6);
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9em;
+            backdrop-filter: blur(5px);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                padding: 15px 20px;
+            }
+
+            .navbar .logo {
+                margin-bottom: 15px;
+            }
+
+            .navbar .nav-links {
+                flex-direction: column;
+                width: 100%;
+                text-align: center;
+            }
+
+            .navbar .nav-links li {
+                margin: 10px 0;
+            }
+
+            .hero-section h1 {
+                font-size: 2.5em;
+            }
+
+            .hero-section p {
+                font-size: 1.1em;
+            }
+
+            .hero-section .cta-button {
+                padding: 12px 25px;
+                font-size: 1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <img src="{% static "images/nev_logo.png" %}" alt="JIT Logo - AI Career System" >
+        </div>
+        <ul class="nav-links">
+            <li><a href="{% url 'about' %}">About</a></li>
+            <li><a href="{% url 'login' %}">Login</a></li>
+            <li><a href="{% url 'register' %}">Register</a></li>
+        </ul>
+    </nav>
+
+    <main class="hero-section">
+         <h1 id="typewriter-title"></h1>
+         <p id="typewriter-subtitle"></p>
+         <a href="{% url 'login' %}" class="cta-button">Get Started Now</a>
+     </main>
+
+    <footer class="footer">
+         &copy; 2025 AI Career Recommended System. All rights reserved.
+     </footer>
+
+     <script>
+         // Typewriter effect for title and subtitle
+         document.addEventListener('DOMContentLoaded', function() {
+             const titleElement = document.getElementById('typewriter-title');
+             const subtitleElement = document.getElementById('typewriter-subtitle');
+
+             const titleText = "AI Career Recommender";
+             const subtitleText = "Discover your perfect career path with AI-powered recommendations, skill assessments, and personalized guidance for your professional journey.\nTake personality tests, analyze job market trends, and get matched with careers that align with your unique strengths and aspirations.\nStart your journey towards a fulfilling and successful career today!";
+
+             // Typewriter function
+             function typeWriter(element, text, speed = 15) {
+                 let i = 0;
+                 element.innerHTML = '';
+                 element.style.display = 'block';
+
+                 function type() {
+                     if (i < text.length) {
+                         // Handle line breaks properly
+                         if (text.charAt(i) === '\n') {
+                             element.innerHTML += '<br>';
+                         } else {
+                             element.innerHTML += text.charAt(i);
+                         }
+                         i++;
+                         setTimeout(type, speed);
+                     }
+                 }
+                 type();
+             }
+
+             // Start typewriter effect after a short delay
+             setTimeout(() => {
+                 typeWriter(titleElement, titleText, 100);
+             }, 500);
+
+             setTimeout(() => {
+                 typeWriter(subtitleElement, subtitleText, 30);
+             }, 2500);
+         });
+     </script>
+ </body>
+ </html>

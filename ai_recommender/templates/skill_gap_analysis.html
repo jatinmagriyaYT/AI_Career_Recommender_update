@@ -1,0 +1,782 @@
+{% load static %}
+{% include "logo.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skill Gap Analysis - AI Career Recommender</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #8B5FBF;
+            --secondary: #D4A5A5;
+            --success: #06D6A0;
+            --info: #118AB2;
+            --warning: #FFD166;
+            --danger: #EF476F;
+            --light: #F8F9FA;
+            --dark: #212529;
+            --sidebar-bg: #2D3047;
+            --card-bg: #FFFFFF;
+            --text-primary: #333333;
+            --text-secondary: #6C757D;
+            --gradient-primary: linear-gradient(135deg, #8B5FBF 0%, #6A4C93 100%);
+            --gradient-secondary: linear-gradient(135deg, #D4A5A5 0%, #C89595 100%);
+            --gradient-success: linear-gradient(135deg, #06D6A0 0%, #04B588 100%);
+            --gradient-warning: linear-gradient(135deg, #FFD166 0%, #FFC145 100%);
+            --gradient-info: linear-gradient(135deg, #118AB2 0%, #0A6E8F 100%);
+            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --hover-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #F5F7FA 0%, #E4E7EB 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+        }
+
+        .sidebar {
+            min-height: 100vh;
+            background: var(--sidebar-bg);
+            box-shadow: 3px 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.85);
+            padding: 1rem 1.5rem;
+            margin: 0.25rem 1rem;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .sidebar .nav-link:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateX(5px);
+        }
+
+        .sidebar .nav-link.active {
+            color: #fff;
+            background: var(--primary);
+            box-shadow: 0 5px 15px rgba(139, 95, 191, 0.3);
+        }
+
+        .sidebar .nav-link i {
+            width: 24px;
+            text-align: center;
+        }
+
+        .main-content {
+            background: #F5F7FA;
+            padding: 2rem;
+        }
+
+        .dashboard-header {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--card-shadow);
+            border-left: 5px solid var(--primary);
+        }
+
+        .content-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--card-shadow);
+        }
+
+        .content-card .card-header {
+            background: transparent;
+            border: none;
+            padding: 0 0 1.5rem 0;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .content-card .card-header h3 {
+            font-weight: 600;
+            color: var(--dark);
+            margin: 0;
+        }
+
+        .btn-primary-custom {
+            background: var(--gradient-primary);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(139, 95, 191, 0.4);
+            color: white;
+        }
+
+        .form-control {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 12px 15px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 0.2rem rgba(139, 95, 191, 0.25);
+        }
+
+        /* Skills Section Styles */
+        .skills-section {
+            margin-bottom: 2.5rem;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid;
+        }
+
+        .section-required .section-header {
+            border-color: var(--info);
+        }
+
+        .section-current .section-header {
+            border-color: var(--success);
+        }
+
+        .section-gaps .section-header {
+            border-color: var(--danger);
+        }
+
+        .section-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            font-size: 1.2rem;
+        }
+
+        .required-icon {
+            background: rgba(17, 138, 178, 0.1);
+            color: var(--info);
+        }
+
+        .current-icon {
+            background: rgba(6, 214, 160, 0.1);
+            color: var(--success);
+        }
+
+        .gaps-icon {
+            background: rgba(239, 71, 111, 0.1);
+            color: var(--danger);
+        }
+
+        .skill-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+        }
+
+        .skill-item {
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .skill-item:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--hover-shadow);
+        }
+
+        .required-skill {
+            background: rgba(17, 138, 178, 0.05);
+            border-color: rgba(17, 138, 178, 0.2);
+        }
+
+        .current-skill {
+            background: rgba(6, 214, 160, 0.05);
+            border-color: rgba(6, 214, 160, 0.2);
+        }
+
+        .gap-skill {
+            background: rgba(239, 71, 111, 0.05);
+            border-color: rgba(239, 71, 111, 0.2);
+        }
+
+        .skill-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 1.1rem;
+        }
+
+        .skill-meta {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .skill-status {
+            margin-left: auto;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .status-required {
+            background: rgba(17, 138, 178, 0.1);
+            color: var(--info);
+        }
+
+        .status-current {
+            background: rgba(6, 214, 160, 0.1);
+            color: var(--success);
+        }
+
+        .status-gap {
+            background: rgba(239, 71, 111, 0.1);
+            color: var(--danger);
+        }
+
+        .gap-score {
+            text-align: center;
+            padding: 2rem;
+            background: var(--gradient-primary);
+            color: white;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+        }
+
+        .gap-score h2 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .gap-score p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin: 0;
+        }
+
+        .no-gaps {
+            text-align: center;
+            padding: 3rem 2rem;
+            background: rgba(6, 214, 160, 0.1);
+            border: 1px solid rgba(6, 214, 160, 0.3);
+            border-radius: 15px;
+        }
+
+        .no-gaps h3 {
+            color: var(--success);
+            margin-bottom: 1rem;
+        }
+
+        .no-gaps p {
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        .user-dropdown .btn {
+            border-radius: 10px;
+            padding: 0.5rem 1rem;
+            border: 1px solid #e9ecef;
+            background: white;
+            color: var(--dark);
+        }
+
+        .user-dropdown .btn:hover {
+            background: #f8f9fa;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            color: var(--secondary);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: var(--card-shadow);
+            text-align: center;
+            transition: all 0.3s ease;
+            border-top: 4px solid transparent;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--hover-shadow);
+        }
+
+        .stat-card.required {
+            border-top-color: var(--info);
+        }
+
+        .stat-card.current {
+            border-top-color: var(--success);
+        }
+
+        .stat-card.gaps {
+            border-top-color: var(--danger);
+        }
+
+        .stat-card.coverage {
+            border-top-color: var(--primary);
+        }
+
+        .stat-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+
+        .required .stat-icon { color: var(--info); }
+        .current .stat-icon { color: var(--success); }
+        .gaps .stat-icon { color: var(--danger); }
+        .coverage .stat-icon { color: var(--primary); }
+
+        .stat-number {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 1rem;
+            }
+            
+            .dashboard-header {
+                padding: 1rem;
+            }
+            
+            .skill-list {
+                grid-template-columns: 1fr;
+            }
+            
+            .content-card {
+                padding: 1.5rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 sidebar p-0">
+                <div class="p-3">
+                    <h5 class="text-white mb-4 pt-3">
+                        <i class="fas fa-robot me-2"></i>AI Career Guide
+                    </h5>
+                    <nav class="nav flex-column">
+                        <a class="nav-link" href="{% url 'dashboard' %}">
+                            <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                        </a>
+                        <a class="nav-link" href="{% url 'profile' %}">
+                            <i class="fas fa-user me-2"></i>Profile
+                        </a>
+                        <a class="nav-link" href="{% url 'resume' %}">
+                            <i class="fas fa-file-alt me-2"></i>Resume
+                        </a>
+                        <a class="nav-link" href="{% url 'skills' %}">
+                            <i class="fas fa-graduation-cap me-2"></i>Learning Hub
+                        </a>
+                        <a class="nav-link" href="{% url 'take_personality_test' %}">
+                            <i class="fas fa-brain me-2"></i>Personality
+                        </a>
+                        <a class="nav-link" href="{% url 'career_recommendations' %}">
+                            <i class="fas fa-briefcase me-2"></i>Careers
+                        </a>
+                        <a class="nav-link active" href="{% url 'skill_gap_analysis' %}">
+                            <i class="fas fa-search me-2"></i>Skill Gap
+                        </a>
+                        <a class="nav-link" href="{% url 'trends' %}">
+                            <i class="fas fa-chart-line me-2"></i>Trends
+                        </a>
+                        <a class="nav-link" href="{% url 'chatbot' %}">
+                            <i class="fas fa-comments me-2"></i>Chatbot
+                        </a>
+                        <hr class="my-3 bg-light opacity-25">
+                        <a class="nav-link" href="{% url 'logout' %}">
+                            <i class="fas fa-sign-out-alt me-2"></i>Logout
+                        </a>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10 main-content p-0">
+                <!-- Header -->
+                <div class="dashboard-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h2 class="mb-1"><i class="fas fa-search me-2" style="color: var(--primary);"></i>Skill Gap Analysis</h2>
+                            <p class="text-muted mb-0">Identify missing skills for your target career and create a learning plan</p>
+                        </div>
+                        <div class="user-dropdown">
+                            <div class="dropdown">
+                                <button class="btn dropdown-toggle d-flex align-items-center" type="button" data-bs-toggle="dropdown">
+                                    <div class="rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px; background: var(--primary);">
+                                        <i class="fas fa-user text-white" style="font-size: 0.9rem;"></i>
+                                    </div>
+                                    <span>{{ user.username }}</span>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><a class="dropdown-item" href="{% url 'profile' %}">View Profile</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'edit_profile' %}">Edit Profile</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="px-3">
+                    <!-- Analysis Form -->
+                    <div class="content-card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-bullseye me-2" style="color: var(--primary);"></i>Select Target Career</h3>
+                        </div>
+                        <div class="card-body">
+                            <form method="post">
+                                {% csrf_token %}
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <div class="mb-3">
+                                            <label for="target_career" class="form-label fw-bold">Choose a career to analyze:</label>
+                                            <select name="target_career" class="form-control form-control-lg" required>
+                                                <option value="">Select a career path...</option>
+                                                {% for career in careers %}
+                                                    <option value="{{ career }}" {% if target_career == career %}selected{% endif %}>
+                                                        {{ career }}
+                                                    </option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 d-flex align-items-end">
+                                        <button type="submit" class="btn-primary-custom w-100">
+                                            <i class="fas fa-chart-line"></i> Analyze Skill Gaps
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="form-text">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    This analysis compares your {{ user_skills_count }} skills with the requirements of your target career
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    {% if skill_gaps %}
+                        <!-- Results Section -->
+                        <div class="content-card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-chart-bar me-2" style="color: var(--primary);"></i>Analysis Results for: {{ target_career }}</h3>
+                            </div>
+                            <div class="card-body">
+                                <!-- Gap Score and Stats -->
+                                <div class="gap-score">
+                                    <h2>{{ skill_gaps.coverage_percentage|default:0 }}%</h2>
+                                    <p>Skills Coverage</p>
+                                </div>
+
+                                <!-- Statistics Overview -->
+                                <div class="stats-grid">
+                                    <div class="stat-card required">
+                                        <i class="fas fa-bullseye stat-icon"></i>
+                                        <div class="stat-number">{{ skill_gaps.required_skills_count|default:0 }}</div>
+                                        <div class="stat-label">Required Skills</div>
+                                    </div>
+                                    <div class="stat-card current">
+                                        <i class="fas fa-check-circle stat-icon"></i>
+                                        <div class="stat-number">{{ skill_gaps.current_skills_count|default:0 }}</div>
+                                        <div class="stat-label">Your Current Skills</div>
+                                    </div>
+                                    <div class="stat-card gaps">
+                                        <i class="fas fa-exclamation-triangle stat-icon"></i>
+                                        <div class="stat-number">{{ skill_gaps.missing_skills_count|default:0 }}</div>
+                                        <div class="stat-label">Skill Gaps</div>
+                                    </div>
+                                    <div class="stat-card coverage">
+                                        <i class="fas fa-chart-pie stat-icon"></i>
+                                        <div class="stat-number">{{ skill_gaps.gap_score|default:0|floatformat:1 }}</div>
+                                        <div class="stat-label">Gap Score</div>
+                                    </div>
+                                </div>
+
+                                <!-- Required Skills Section -->
+                                <div class="skills-section section-required">
+                                    <div class="section-header">
+                                        <div class="section-icon required-icon">
+                                            <i class="fas fa-bullseye"></i>
+                                        </div>
+                                        <div>
+                                            <h4 class="mb-1" style="color: var(--info);">Required Skills</h4>
+                                            <p class="text-muted mb-0">Essential skills needed for {{ target_career }}</p>
+                                        </div>
+                                    </div>
+                                    
+                                    {% if skill_gaps.required_skills %}
+                                        <div class="skill-list">
+                                            {% for skill in skill_gaps.required_skills %}
+                                                <div class="skill-item required-skill">
+                                                    <div class="skill-info">
+                                                        <div class="skill-name">{{ skill.name }}</div>
+                                                    </div>
+                                                    <span class="skill-status status-required">Required</span>
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                    {% else %}
+                                        <div class="empty-state" style="padding: 2rem 1rem;">
+                                            <i class="fas fa-bullseye"></i>
+                                            <p>No required skills data available for {{ target_career }}</p>
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <!-- Current Skills Section -->
+                                <div class="skills-section section-current">
+                                    <div class="section-header">
+                                        <div class="section-icon current-icon">
+                                            <i class="fas fa-check-circle"></i>
+                                        </div>
+                                        <div>
+                                            <h4 class="mb-1" style="color: var(--success);">Your Current Skills</h4>
+                                            <p class="text-muted mb-0">Skills you already have that match the requirements</p>
+                                        </div>
+                                    </div>
+                                    
+                                    {% if skill_gaps.current_skills %}
+                                        <div class="skill-list">
+                                            {% for skill in skill_gaps.current_skills %}
+                                                <div class="skill-item current-skill">
+                                                    <div class="skill-info">
+                                                        <div class="skill-name">{{ skill.name }}</div>
+                                                    </div>
+                                                    <span class="skill-status status-current">You Have This</span>
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                    {% else %}
+                                        <div class="empty-state" style="padding: 2rem 1rem;">
+                                            <i class="fas fa-check-circle"></i>
+                                            <p>No matching skills found. You'll need to develop all required skills.</p>
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <!-- Skill Gaps Section -->
+                                <div class="skills-section section-gaps">
+                                    <div class="section-header">
+                                        <div class="section-icon gaps-icon">
+                                            <i class="fas fa-exclamation-triangle"></i>
+                                        </div>
+                                        <div>
+                                            <h4 class="mb-1" style="color: var(--danger);">Skill Gaps</h4>
+                                            <p class="text-muted mb-0">Skills you need to develop for {{ target_career }}</p>
+                                        </div>
+                                    </div>
+                                    
+                                    {% if skill_gaps.missing_skills %}
+                                        <div class="skill-list">
+                                            {% for skill in skill_gaps.missing_skills %}
+                                                <div class="skill-item gap-skill">
+                                                    <div class="skill-info">
+                                                        <div class="skill-name">{{ skill.name }}</div>
+                                                    </div>
+                                                    <span class="skill-status status-gap">Need to Learn</span>
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+
+                                        <!-- Action Plan -->
+                                        <div class="mt-4 p-4" style="background: rgba(255, 209, 102, 0.1); border-radius: 12px; border: 1px solid rgba(255, 209, 102, 0.3);">
+                                            <h5 style="color: var(--warning);">
+                                                <i class="fas fa-rocket me-2"></i>Recommended Action Plan
+                                            </h5>
+                                            <div class="row mt-3">
+                                                <div class="col-md-6">
+                                                    <h6 style="color: var(--dark);">Immediate Actions:</h6>
+                                                    <ul style="color: var(--text-secondary);">
+                                                        <li>Focus on learning 2-3 high-priority skills first</li>
+                                                        <li>Set realistic timelines for skill development</li>
+                                                        <li>Practice through projects and real-world applications</li>
+                                                    </ul>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <h6 style="color: var(--dark);">Learning Resources:</h6>
+                                                    <ul style="color: var(--text-secondary);">
+                                                        <li>Consider online courses and certifications</li>
+                                                        <li>Find mentorship opportunities</li>
+                                                        <li>Join professional communities</li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% else %}
+                                        <!-- No Gaps Found -->
+                                        <div class="no-gaps">
+                                            <h3><i class="fas fa-trophy me-2"></i>Excellent Match!</h3>
+                                            <p class="mb-3">You have all the required skills for a career in {{ target_career }}</p>
+                                            <a href="{% url 'career_recommendations' %}" class="btn-primary-custom">
+                                                <i class="fas fa-briefcase me-2"></i>View Career Recommendations
+                                            </a>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    {% elif request.method == 'POST' %}
+                        <!-- No Results Message -->
+                        <div class="content-card">
+                            <div class="empty-state">
+                                <i class="fas fa-search"></i>
+                                <h5 class="mb-3">No Analysis Results</h5>
+                                <p class="mb-4">Please select a valid career path to analyze your skill gaps</p>
+                            </div>
+                        </div>
+                    {% else %}
+                        <!-- Instructions -->
+                        <div class="content-card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-question-circle me-2" style="color: var(--info);"></i>How It Works</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="text-center p-3">
+                                            <div class="rounded-circle bg-primary d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                                                <i class="fas fa-user-check text-white" style="font-size: 2rem;"></i>
+                                            </div>
+                                            <h5>1. Your Skills</h5>
+                                            <p class="text-muted">We analyze your current skills from your profile and assessments</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="text-center p-3">
+                                            <div class="rounded-circle bg-success d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                                                <i class="fas fa-briefcase text-white" style="font-size: 2rem;"></i>
+                                            </div>
+                                            <h5>2. Career Requirements</h5>
+                                            <p class="text-muted">We compare with required skills for your target career</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="text-center p-3">
+                                            <div class="rounded-circle bg-warning d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                                                <i class="fas fa-chart-line text-white" style="font-size: 2rem;"></i>
+                                            </div>
+                                            <h5>3. Gap Analysis</h5>
+                                            <p class="text-muted">We identify missing skills and provide recommendations</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Auto-focus on career select
+            const careerSelect = document.querySelector('select[name="target_career"]');
+            if (careerSelect) {
+                careerSelect.focus();
+            }
+
+            // Add animation to skill items
+            const skillItems = document.querySelectorAll('.skill-item');
+            skillItems.forEach((item, index) => {
+                item.style.animationDelay = `${index * 0.1}s`;
+                item.style.animation = 'fadeInUp 0.5s ease-out';
+            });
+        });
+
+        // Add CSS animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(20px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+            
+            .skill-item {
+                animation-fill-mode: both;
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

@@ -1,0 +1,143 @@
+
+
+
+{% load static %}
+{% include "logo.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume Analysis - AI Career System</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            color: white;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .analysis-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .analysis-results {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .result-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 25px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .result-card h3 {
+            color: #007bff;
+            margin-bottom: 15px;
+        }
+
+        .skills-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .skill-tag {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.9em;
+            text-align: center;
+        }
+
+        .back-btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            padding: 12px 30px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 123, 255, 0.4);
+        }
+
+        .error {
+            text-align: center;
+            color: #ff6b6b;
+            font-size: 1.2em;
+            padding: 40px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="analysis-card">
+            <h1>Resume Analysis Results</h1>
+
+            {% if analysis %}
+                <div class="analysis-results">
+                    <div class="result-card">
+                        <h3>📊 Analysis Summary</h3>
+                        <p><strong>Text Length:</strong> {{ analysis.text_length }} characters</p>
+                        <p><strong>Analysis Method:</strong> {{ analysis.analysis_method }}</p>
+                        <p><strong>Experience Years:</strong> {{ analysis.experience_years|default:0 }}</p>
+                    </div>
+
+                    <div class="result-card">
+                        <h3>🛠️ Extracted Skills</h3>
+                        {% if analysis.skills %}
+                            <div class="skills-list">
+                                {% for skill in analysis.skills %}
+                                    <span class="skill-tag">{{ skill }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <p>No skills detected in the resume.</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div style="text-align: center;">
+                    <a href="{% url 'resume' %}" class="back-btn">Upload Another Resume</a>
+                    <a href="{% url 'dashboard' %}" class="back-btn" style="background: linear-gradient(135deg, #28a745, #20c997);">Go to Dashboard</a>
+                </div>
+            {% elif error %}
+                <div class="error">{{ error }}</div>
+            {% else %}
+                <div class="error">No analysis results available.</div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

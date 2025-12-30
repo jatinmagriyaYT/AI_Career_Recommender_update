@@ -1,0 +1,371 @@
+{% load static %}
+{% include "logo.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learning Hub - AI Career Recommender</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #8B5FBF;
+            --secondary: #D4A5A5;
+            --success: #06D6A0;
+            --info: #118AB2;
+            --warning: #FFD166;
+            --danger: #EF476F;
+            --light: #F8F9FA;
+            --dark: #212529;
+            --sidebar-bg: #2D3047;
+            --card-bg: #FFFFFF;
+            --text-primary: #333333;
+            --text-secondary: #6C757D;
+            --gradient-primary: linear-gradient(135deg, #8B5FBF 0%, #6A4C93 100%);
+            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --hover-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #F5F7FA 0%, #E4E7EB 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+        }
+
+        .sidebar {
+            min-height: 100vh;
+            background: var(--sidebar-bg);
+            box-shadow: 3px 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.85);
+            padding: 1rem 1.5rem;
+            margin: 0.25rem 1rem;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            color: #fff;
+            background: var(--primary);
+            box-shadow: 0 5px 15px rgba(139, 95, 191, 0.3);
+            transform: translateX(5px);
+        }
+
+        .main-content {
+            padding: 2rem;
+        }
+
+        .hero-section {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 3rem 2rem;
+            border-radius: 20px;
+            margin-bottom: 3rem;
+            box-shadow: var(--card-shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 300px;
+            height: 100%;
+            background: url('https://img.freepik.com/free-vector/online-learning-concept-illustration_114360-4542.jpg') no-repeat center right;
+            background-size: contain;
+            opacity: 0.2;
+        }
+
+        .section-title {
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Roadmap Styles */
+        .roadmap-container {
+            position: relative;
+            padding: 2rem 0;
+        }
+
+        .roadmap-line {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: #e9ecef;
+            transform: translateX(-50%);
+        }
+
+        .roadmap-step {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        .roadmap-step:nth-child(even) {
+            flex-direction: row-reverse;
+        }
+
+        .step-content {
+            width: 45%;
+            background: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: var(--card-shadow);
+            position: relative;
+            transition: transform 0.3s ease;
+        }
+
+        .step-content:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--hover-shadow);
+        }
+
+        .step-number {
+            position: absolute;
+            left: 50%;
+            width: 40px;
+            height: 40px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            transform: translateX(-50%);
+            z-index: 2;
+            box-shadow: 0 0 0 5px white;
+        }
+
+        /* Resource Cards */
+        .resource-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+            height: 100%;
+            border: 1px solid #eee;
+        }
+
+        .resource-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--hover-shadow);
+        }
+
+        .video-thumbnail {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 aspect ratio */
+            background: #000;
+            overflow: hidden;
+        }
+
+        .video-thumbnail img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.8;
+            transition: opacity 0.3s;
+        }
+
+        .resource-card:hover .video-thumbnail img {
+            opacity: 1;
+        }
+
+        .play-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3rem;
+            color: white;
+            opacity: 0.9;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+
+        .resource-body {
+            padding: 1.5rem;
+        }
+
+        .resource-tag {
+            display: inline-block;
+            padding: 4px 12px;
+            background: rgba(139, 95, 191, 0.1);
+            color: var(--primary);
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .course-card {
+            border-left: 5px solid var(--success);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            background: white;
+            border-radius: 15px;
+            box-shadow: var(--card-shadow);
+        }
+
+        @media (max-width: 768px) {
+            .roadmap-line { left: 20px; }
+            .roadmap-step { flex-direction: column; align-items: flex-start; padding-left: 50px; }
+            .roadmap-step:nth-child(even) { flex-direction: column; align-items: flex-start; }
+            .step-content { width: 100%; }
+            .step-number { left: 20px; transform: translateX(-50%); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 sidebar p-0">
+                <div class="p-3">
+                    <h5 class="text-white mb-4 pt-3">
+                        <i class="fas fa-robot me-2"></i>AI Career Guide
+                    </h5>
+                    <nav class="nav flex-column">
+                        <a class="nav-link" href="{% url 'dashboard' %}"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</a>
+                        <a class="nav-link" href="{% url 'profile' %}"><i class="fas fa-user me-2"></i>Profile</a>
+                        <a class="nav-link" href="{% url 'resume' %}"><i class="fas fa-file-alt me-2"></i>Resume</a>
+                        <a class="nav-link active" href="{% url 'skills' %}"><i class="fas fa-graduation-cap me-2"></i>Learning Hub</a>
+                        <a class="nav-link" href="{% url 'take_personality_test' %}"><i class="fas fa-brain me-2"></i>Personality</a>
+                        <a class="nav-link" href="{% url 'career_recommendations' %}"><i class="fas fa-briefcase me-2"></i>Careers</a>
+                        <a class="nav-link" href="{% url 'skill_gap_analysis' %}"><i class="fas fa-search me-2"></i>Skill Gap</a>
+                        <a class="nav-link" href="{% url 'trends' %}"><i class="fas fa-chart-line me-2"></i>Trends</a>
+                        <a class="nav-link" href="{% url 'chatbot' %}"><i class="fas fa-comments me-2"></i>Chatbot</a>
+                        <hr class="my-3 bg-light opacity-25">
+                        <a class="nav-link" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt me-2"></i>Logout</a>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10 main-content">
+                
+                <!-- Hero Section -->
+                <div class="hero-section">
+                    <h1 class="display-5 fw-bold mb-3">Your Path to Becoming a {{ target_career }}</h1>
+                    <p class="lead mb-0">We've curated a personalized learning roadmap and resources to help you bridge your skill gaps and achieve your career goals.</p>
+                </div>
+
+                <!-- Career Roadmap -->
+                <div class="mb-5">
+                    <h3 class="section-title"><i class="fas fa-map-signs text-primary"></i> Career Roadmap</h3>
+                    {% if roadmap %}
+                        <div class="roadmap-container">
+                            <div class="roadmap-line"></div>
+                            {% for step in roadmap %}
+                                <div class="roadmap-step">
+                                    <div class="step-number">{{ step.step }}</div>
+                                    <div class="step-content">
+                                        <h5 class="fw-bold text-primary">{{ step.title }}</h5>
+                                        <p class="text-muted mb-0">{{ step.desc }}</p>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="empty-state">
+                            <i class="fas fa-map text-muted fa-3x mb-3"></i>
+                            <h5>Roadmap Coming Soon</h5>
+                            <p>We are currently building the roadmap for this specific career path.</p>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Video Resources -->
+                <div class="mb-5">
+                    <h3 class="section-title"><i class="fab fa-youtube text-danger"></i> Recommended Video Tutorials</h3>
+                    <p class="text-muted mb-4">Curated videos for your missing skills.</p>
+                    
+                    {% if videos %}
+                        <div class="row g-4">
+                            {% for video in videos %}
+                                <div class="col-md-6 col-lg-4">
+                                    <div class="resource-card">
+                                        <a href="{{ video.url }}" target="_blank" class="text-decoration-none">
+                                            <div class="video-thumbnail">
+                                                <img src="{{ video.thumbnail }}" alt="{{ video.title }}">
+                                                <i class="fas fa-play-circle play-icon"></i>
+                                            </div>
+                                            <div class="resource-body">
+                                                <span class="resource-tag">{{ video.skill }}</span>
+                                                <h6 class="text-dark fw-bold mb-2">{{ video.title }}</h6>
+                                                <small class="text-muted"><i class="fas fa-tv me-1"></i> {{ video.channel }}</small>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="empty-state">
+                            <i class="fas fa-video text-muted fa-3x mb-3"></i>
+                            <h5>No Videos Found</h5>
+                            <p>Great job! You seem to have most of the required skills, or we are updating our library.</p>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Paid Courses -->
+                <div class="mb-5">
+                    <h3 class="section-title"><i class="fas fa-certificate text-success"></i> Premium Courses</h3>
+                    <p class="text-muted mb-4">Top-rated courses to master advanced topics.</p>
+                    
+                    {% if courses %}
+                        <div class="row g-4">
+                            {% for course in courses %}
+                                <div class="col-md-6">
+                                    <div class="resource-card course-card p-4">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div>
+                                                <span class="resource-tag bg-light text-dark border">{{ course.skill }}</span>
+                                                <h5 class="fw-bold mt-2 mb-2">{{ course.title }}</h5>
+                                                <p class="text-muted mb-3"><i class="fas fa-laptop-code me-2"></i> {{ course.platform }}</p>
+                                            </div>
+                                            <i class="fas fa-external-link-alt text-muted"></i>
+                                        </div>
+                                        <a href="{{ course.url }}" target="_blank" class="btn btn-outline-success w-100">View Course</a>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="empty-state">
+                            <i class="fas fa-graduation-cap text-muted fa-3x mb-3"></i>
+                            <h5>No Courses Found</h5>
+                            <p>Check back later for updated course recommendations.</p>
+                        </div>
+                    {% endif %}
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

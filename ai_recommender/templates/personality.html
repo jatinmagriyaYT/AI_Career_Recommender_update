@@ -1,0 +1,360 @@
+
+
+{% load static %}
+{% include "logo.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personality Assessment - AI Career System</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .assessment-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .assessment-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .assessment-header h1 {
+            color: white;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .assessment-header p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.1em;
+        }
+
+        .form-group {
+            margin-bottom: 30px;
+        }
+
+        .form-group label {
+            display: block;
+            color: white;
+            font-weight: bold;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        .question {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .question p {
+            color: white;
+            margin-bottom: 15px;
+            font-size: 1.05em;
+        }
+
+        .radio-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 15px;
+        }
+
+        .radio-option {
+            text-align: center;
+        }
+
+        .radio-option input[type="radio"] {
+            margin-right: 8px;
+        }
+
+        .radio-option label {
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: normal;
+            cursor: pointer;
+        }
+
+        .scale-labels {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            text-align: center;
+            margin-bottom: 10px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9em;
+        }
+
+        .btn-container {
+            text-align: center;
+            padding-top: 30px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 15px 40px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 123, 255, 0.4);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="assessment-card">
+            <div class="assessment-header">
+                <h1>Personality Assessment</h1>
+                <p>Answer the following questions to help us understand your personality type and recommend suitable careers</p>
+            </div>
+
+            <form method="post">
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <label>Rate how well each statement describes you:</label>
+
+                    <div class="question">
+                        <p>1. I am the life of the party</p>
+                        <div class="scale-labels">
+                            <span>Strongly Disagree</span>
+                            <span>Disagree</span>
+                            <span>Neutral</span>
+                            <span>Agree</span>
+                            <span>Strongly Agree</span>
+                        </div>
+                        <div class="radio-group">
+                            {% for i in "12345" %}
+                                <div class="radio-option">
+                                    <input type="radio" name="question_1" value="{{ i }}" required>
+                                    <label>{{ i }}</label>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="question">
+                        <p>2. I feel comfortable around people</p>
+                        <div class="scale-labels">
+                            <span>Strongly Disagree</span>
+                            <span>Disagree</span>
+                            <span>Neutral</span>
+                            <span>Agree</span>
+                            <span>Strongly Agree</span>
+                        </div>
+                        <div class="radio-group">
+                            {% for i in "12345" %}
+                                <div class="radio-option">
+                                    <input type="radio" name="question_2" value="{{ i }}" required>
+                                    <label>{{ i }}</label>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="question">
+                        <p>3. I get stressed out easily</p>
+                        <div class="scale-labels">
+                            <span>Strongly Disagree</span>
+                            <span>Disagree</span>
+                            <span>Neutral</span>
+                            <span>Agree</span>
+                            <span>Strongly Agree</span>
+                        </div>
+                        <div class="radio-group">
+                            {% for i in "12345" %}
+                                <div class="radio-option">
+                                    <input type="radio" name="question_3" value="{{ i }}" required>
+                                    <label>{{ i }}</label>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="question">
+                        <p>4. I have a vivid imagination</p>
+                        <div class="scale-labels">
+                            <span>Strongly Disagree</span>
+                            <span>Disagree</span>
+                            <span>Neutral</span>
+                            <span>Agree</span>
+                            <span>Strongly Agree</span>
+                        </div>
+                        <div class="radio-group">
+                            {% for i in "12345" %}
+                                <div class="radio-option">
+                                    <input type="radio" name="question_4" value="{{ i }}" required>
+                                    <label>{{ i }}</label>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="question">
+                        <p>5. I am always prepared</p>
+                        <div class="scale-labels">
+                            <span>Strongly Disagree</span>
+                            <span>Disagree</span>
+                            <span>Neutral</span>
+                            <span>Agree</span>
+                            <span>Strongly Agree</span>
+                        </div>
+                        <div class="radio-group">
+                            {% for i in "12345" %}
+                                <div class="radio-option">
+                                    <input type="radio" name="question_5" value="{{ i }}" required>
+                                    <label>{{ i }}</label>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Additional questions for better assessment -->
+                    <div class="question">
+                        <p>6. I prefer to work with facts and figures</p>
+                        <div class="scale-labels">
+                            <span>Strongly Disagree</span>
+                            <span>Disagree</span>
+                            <span>Neutral</span>
+                            <span>Agree</span>
+                            <span>Strongly Agree</span>
+                        </div>
+                        <div class="radio-group">
+                            {% for i in "12345" %}
+                                <div class="radio-option">
+                                    <input type="radio" name="question_6" value="{{ i }}" required>
+                                    <label>{{ i }}</label>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="question">
+                        <p>7. I make decisions based on logic rather than feelings</p>
+                        <div class="scale-labels">
+                            <span>Strongly Disagree</span>
+                            <span>Disagree</span>
+                            <span>Neutral</span>
+                            <span>Agree</span>
+                            <span>Strongly Agree</span>
+                        </div>
+                        <div class="radio-group">
+                            {% for i in "12345" %}
+                                <div class="radio-option">
+                                    <input type="radio" name="question_7" value="{{ i }}" required>
+                                    <label>{{ i }}</label>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="question">
+                        <p>8. I like to have a structured schedule</p>
+                        <div class="scale-labels">
+                            <span>Strongly Disagree</span>
+                            <span>Disagree</span>
+                            <span>Neutral</span>
+                            <span>Agree</span>
+                            <span>Strongly Agree</span>
+                        </div>
+                        <div class="radio-group">
+                            {% for i in "12345" %}
+                                <div class="radio-option">
+                                    <input type="radio" name="question_8" value="{{ i }}" required>
+                                    <label>{{ i }}</label>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="question">
+                        <p>9. I enjoy helping others</p>
+                        <div class="scale-labels">
+                            <span>Strongly Disagree</span>
+                            <span>Disagree</span>
+                            <span>Neutral</span>
+                            <span>Agree</span>
+                            <span>Strongly Agree</span>
+                        </div>
+                        <div class="radio-group">
+                            {% for i in "12345" %}
+                                <div class="radio-option">
+                                    <input type="radio" name="question_9" value="{{ i }}" required>
+                                    <label>{{ i }}</label>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="question">
+                        <p>10. I am open to new experiences</p>
+                        <div class="scale-labels">
+                            <span>Strongly Disagree</span>
+                            <span>Disagree</span>
+                            <span>Neutral</span>
+                            <span>Agree</span>
+                            <span>Strongly Agree</span>
+                        </div>
+                        <div class="radio-group">
+                            {% for i in "12345" %}
+                                <div class="radio-option">
+                                    <input type="radio" name="question_10" value="{{ i }}" required>
+                                    <label>{{ i }}</label>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="btn-container">
+                    <button type="submit" class="btn btn-primary">Complete Assessment</button>
+                    <a href="{% url 'dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
