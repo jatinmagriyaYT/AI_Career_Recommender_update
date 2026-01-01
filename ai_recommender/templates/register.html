@@ -86,6 +86,30 @@
             color: rgba(255, 255, 255, 0.7);
         }
 
+        /* ===== FINAL STABLE SELECT FIX ===== */
+
+.input-group select {
+    background-color: rgba(255,255,255,0.2);
+    color: #ffffff;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+
+/* dropdown list (native, cannot be transparent) */
+.input-group select option {
+    background-color: #ffffff;
+    color: #000000;
+}
+
+/* hover / selected */
+.input-group select option:hover,
+.input-group select option:checked {
+    background-color: #007bff;
+    color: #ffffff;
+}
+
+
         button {
             background-color: #007bff;
             color: white;
@@ -263,7 +287,7 @@
                     </div>
                     <div class="form-column">
                         <div class="input-group">
-                            <label for="{{ form.gender.id_for_label }}">Gender</label>
+                            <label for="{{ form.gender.id_for_label }}" >Gender</label>
                             {{ form.gender }}
                             {% if form.gender.errors %}
                                 <div class="error">{{ form.gender.errors.0 }}</div>
